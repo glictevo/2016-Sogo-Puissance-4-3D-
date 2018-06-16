@@ -2,7 +2,7 @@
 
 Projet réalisé par :
 
-* Dez Kande
+* Desse Kande
 
 * Jennifer Da Mata Tinoco
 
