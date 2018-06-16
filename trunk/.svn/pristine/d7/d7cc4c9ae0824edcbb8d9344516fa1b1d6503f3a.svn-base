@@ -1,0 +1,62 @@
+public class SogoTournant extends Sogo{
+
+  public SogoTournant(Affichage affichage, Input input){
+    super(affichage, input, new PlateauTournant(4, 4, 4));
+  }
+  /**
+    * Appelle placerPion dans la classe mère
+    * Permet à un joueur de placer un pion sur le plateau
+    * Puis lui permet de tourner ou non les piliers du centre du plateau
+    */
+  public void placerPion(Write file, String mode, String nomfichier){
+    super.placerPion(file,mode,nomfichier);
+
+    //Le joueur choisit s'il veut tourner le centre du plateau ou non
+    boolean verif = false;
+    int nbQuartDeTour = 0;
+    int count = 0;
+    do{
+      nbQuartDeTour = joueurActuel.demanderNbQuartDeTour(super.plateau, affichage,file,joueurActuel,mode,nomfichier);
+      affichage.afficherMessage("nbQuartDeTour correspond à : " + nbQuartDeTour);
+      count++;
+      if(count > 3){
+        System.exit(0);
+      }
+
+      if(joueurActuel == joueur1){
+        int nbQuartDeTourJoueur1 = ((PlateauTournant)super.plateau).getNbQuartDeTourJoueur(0);
+        if(nbQuartDeTour <= nbQuartDeTourJoueur1){
+          verif = true;
+          ((PlateauTournant)super.plateau).setNbQuartDeTourJoueur(1, nbQuartDeTourJoueur1 - nbQuartDeTour);
+          System.out.println("nbQuartDeTourJoueur1 avant : " + nbQuartDeTourJoueur1);
+          System.out.println("nbQuartDeTour effectué : " + nbQuartDeTour);
+          System.out.println("nbQuartDeTour après : " + (nbQuartDeTourJoueur1 - nbQuartDeTour));
+        }
+      } else {
+        int nbQuartDeTourJoueur2 = ((PlateauTournant)super.plateau).getNbQuartDeTourJoueur(1);
+        if(nbQuartDeTour <= nbQuartDeTourJoueur2){
+          verif = true;
+          ((PlateauTournant)super.plateau).setNbQuartDeTourJoueur(2, nbQuartDeTourJoueur2 - nbQuartDeTour);
+          System.out.println("nbQuartDeTour : " + (nbQuartDeTourJoueur2 - nbQuartDeTour));        }
+      }
+    } while(!verif);
+
+    //Si le joueur a choisi de déplacer le centre, on le fait
+    if(nbQuartDeTour > 0){
+      for(int i = 0; i < nbQuartDeTour; i++){
+        ((PlateauTournant)super.plateau).tournerCentre();
+      }
+    }
+  }
+
+  /**
+    * Réinitialise le plateau de jeu et le nombre de pions de Sogo pour permettre à une nouvelle partie d'être lancée
+    */
+  public void reinitialiserPartie(){
+    this.nombreDePions = 64;
+    ((PlateauTournant)plateau).setNbQuartDeTourJoueur(1, 4);
+    ((PlateauTournant)plateau).setNbQuartDeTourJoueur(2, 4);
+    this.plateau = new PlateauTournant(4, 4, 4);
+  }
+
+}

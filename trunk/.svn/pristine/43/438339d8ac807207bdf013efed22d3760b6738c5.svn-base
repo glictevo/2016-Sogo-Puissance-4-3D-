@@ -1,0 +1,147 @@
+/**
+  * Cette classe permet de gérer les input rentrés depuis l'interface graphique
+  * Ces inputs sont utilisés par un joueur Humain
+  * Les fonctions permettent de récupérer différents type d'informations
+  * nécessaire au jeu
+  */
+
+public class Listener implements Input{
+
+
+import javafx.geometry.*;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.stage.Stage;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.Button;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class Listener implements Input {
+
+
+
+  public Coordonnees recupererCoordonnees(Affichage affichage,Write file, Joueur j,String mode, String nomfichier){
+
+
+    return null;
+  }
+
+  public String recupererNom(Affichage affichage, int joueur, Write file, String mode,String nomfichier){
+
+
+    return "";
+  }
+
+  public boolean demanderNouvellePartie(Affichage affichage,String file){
+
+
+    return true;
+  }
+  public void clear(String file){
+  }
+  public void archiverPartie(Affichage affichage,Write file){
+
+  }
+  public void confirmation(Affichage affichage,Write file){
+
+  }
+
+  public int demanderNbQuartDeTour(Affichage affichage,Write file,Joueur j,String mode, String nomfichier){
+
+
+    return 0;
+  }
+
+  public String demanderVersion(Affichage affichage){
+
+      String[] s={""};
+
+      JFrame f = new JFrame("Choix");
+
+      f.setSize(300,100);
+
+      JPanel pannel = new JPanel();
+
+      JButton bouton1 = new JButton("Terminal");
+      JButton bouton2 = new JButton("Interface");
+
+      bouton1.addActionListener( new ActionListener() {
+
+          public void actionPerformed(ActionEvent e) {
+
+              s[0]= "1";
+              f.dispose();
+
+          }
+
+      }
+      );
+
+      bouton2.addActionListener( new ActionListener() {
+
+          public void actionPerformed(ActionEvent e) {
+
+              s[0]= "2";
+              f.dispose();
+          }
+
+      }
+      );
+
+
+      pannel.add(bouton1);
+      pannel.add(bouton2);
+      f.getContentPane().add(pannel);
+      f.setVisible(true);
+
+      while (s[0].equals("")) {
+          try {
+              Thread.sleep(100);
+          } catch (InterruptedException e) {
+              System.out.println("erreur");
+
+          }
+      }
+
+      return s[0];
+  }
+  public String demanderTypePartie(Affichage affichage){
+
+    return "";
+  }
+   public String demanderSogo(Affichage affichage){
+
+    return "";
+  }
+  public String lsFichiers(Affichage affichage){
+    return("");
+  }
+
+  public Joueur demanderJoueur(Affichage affichage, Input input, int numJoueur, Write file, String mode, String nomfichier){
+    return null;
+  }
+
+  public int demanderHumainOuIA(Affichage affichage, int numJoueur,Write file,String mode,String nomfichier){
+    return 0;
+  }
+
+  public int demanderProfondeur(Affichage affichage,Write file,String mode,String nomfichier){
+    return 0;
+  }
+
+  public int demanderTypeComportement(Affichage affichage,Write file,String mode,String nomfichier){
+    return 0;
+  }
+  public int localise(String chaine,String[]str){
+    return 0;
+  }
+  public String suitePartie(Affichage affichage){
+    return("");
+  }
+}

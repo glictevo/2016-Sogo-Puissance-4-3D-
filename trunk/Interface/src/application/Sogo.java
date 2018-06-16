@@ -1,0 +1,1233 @@
+package application;
+
+
+import java.io.Serializable;
+import java.net.URL;
+import java.util.ResourceBundle;
+
+import application.Sogo.Capteurs;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.PhongMaterial;
+import javafx.scene.shape.Sphere;
+import javafx.stage.Stage;
+import javafx.util.Duration;
+
+/**
+ * Cette classe prend le relais de l'interface graphique à partir
+ * du menu de choix des joueurs. Elle à le même rôle que dans la
+ * version terminal : gérer le déroulement du jeu.
+ */
+public class Sogo implements Serializable,Initializable{
+
+    /**Les attributs du Sogo sont divisés en plusieurs parties qui sont les suivantes:
+     *Les attributs associés à la page players.fxml :
+     *  les attributs gérant le choix d'un joueur :
+     *      -un @link playerHumain1 -> le joueur1 sera un humain
+     *      -un @link playerHumain2 -> le joueur2 sera un humain
+     *      -un @link playerIA1 -> le joueur1 sera une IA
+     *      -un @link playerIA2 -> le joueur2 sera une IA
+     *  lancement de création d'un joueur :
+     *      -un @link validationH1 -> lance la création du joueur1 de type humain
+     *      -un @link validationH2 -> lance la création du joueur2 de type humain
+     *      -un @link validationIA1 -> lance la création du joueur1 de type IA
+     *      -un @link validationIA2 -> lance la création du joueur1 de type IA
+     *   les attributs carctérisants les IA 
+     *      - un @link combobox1 correspond aux comportements de l'IA1
+     *      - un @link combobox2 correspond aux comportements de l'IA2
+     *      - un @link combobox3 correspond aux  profondeurs  de l'IA1
+     *      - un @link combobox4 correspond aux  profondeurs  de l'IA2
+     *   les attributs des zones de saisies des joueurs humains :
+     *      - un @link zoneDeSaisie1 -> zone recuperant le nom du joueur1
+     *      - un @link zoneDeSaisie2 -> zone recuperant le nom du joueur2
+     *   les attributs pour recommencer la création d'un joueur :
+     *      - un @link recommencer1 -> permettant au joueur1 de recommener
+     *      - un @link recommencer2 -> permettant au joueur2 de recommener
+     *
+     *Les attributs associés au plateau du jeu servant pour les interactions avec les joueurs:
+     *  les attributs d'affichages du partie droite du plateau:
+     *      - un @link player1Name affiche le nom du joueur1
+     *      - un @link player2Name affiche le nom du joueur2
+     *      - un @link player1Score affiche le(s) point(s) du joueur1
+     *      - un @link player2Score affiche le(s) point(s) du joueur2
+     *  les attributs d'affichages des boutons des IA activé lors d'une partie associant une ia:
+     *      - un @link plateauIA1 -> image du bouton IA1
+     *      - un @link plaTeauIA1 -> capteur du bouton IA1
+     *      - un @link plateauIA2 -> image du bouton IA2
+     *      - un @link plaTeauIA2 -> capteur du bouton IA2
+     *  tableau d'interation :
+     *      - un @link communication permet la communication avec les jouers lors d'une partie
+
+     *  les choix de fin de partie : 
+     *      - un @link archiver 
+     *      - un @link archiveOUI
+     *      - un @link archiveNON
+     *      - un @link Continue1 -> choix de continuer la partie
+     *      - un @link zonesaisieArchive permet à l'utilisateur de rentrer le nom du fichier
+     *      - un @link validerArchive permet d'archiver la partie
+     *      - un @link archiveMessage interagit avec le joueur (nommez votre fichier etc...)
+     *  les attributs de la partie en mode lecture :
+     *      - un @link lectureInterface -> image du bouton play du plateau
+     *      - un @link lectureInterfaceG -> capteur du bouton play
+     * 
+     *les attributs pour le sogoTournant :
+     *  -un @link nbQuartDeOui
+     *  -un @link nbQuartDeNon
+     *Les attributs de l'objet sogo
+     *  - un @link Plateau
+     *  - deux @link Joueur
+     *  - un des deux joueurs stocké dans joueurActuel, pour savoir lequel est entrain de jouer son tour
+     *  - un @link Affichage permettant de savoir quel affichage on utilise
+     *  - un @link Input permettant de savoir quel type d'input on utilise
+     *  - le nombre de pions, mis a 64 car on décide d'utiliser dans tous les
+     *   cas un plateau de 4x4x4 de dimensions
+     *  - deux compteurs de parties gagnées, un pour chaque joueur
+     *  - un @link joueurGagnant est utilisé pour stocker le resultat de fin de partie
+     *  - un @link partieTerminal utilisant les attributs d'une partie teminal
+     *  - un @link partieInterface utilisant les attributs d'une partie Interface
+     *  - un @link typeSogoEnCours  permet de savoir le type du sogo en cours d'execution
+     */  
+    private static final long serialVersionUID = 1L;
+    protected Plateau plateau;
+    protected static Joueur joueur1;
+    protected static Joueur joueur2;
+    protected static Joueur joueurActuel;
+    protected Affichage affichage;
+    protected Input input;
+    protected int nombreDePions = 64;
+    private static int nbPartiesGagneesJoueur1 = 0;
+    private static int nbPartiesGagneesJoueur2 = 0;
+    
+    protected static boolean joueurGagnant = false;
+    
+  
+    protected ScannerInput partieTerminal = new ScannerInput();
+    protected Listener partieInterface = new Listener();
+    private static int update = 0;
+  
+  
+    private Sogo sogo = partieInterface.getSogo();
+    private String typeSogoEnCours = ((sogo instanceof SogoTournant)?"Tournant":"Simple");
+  
+    //Attributs interface
+    @FXML
+    private ComboBox<String> combobox1;
+    @FXML
+    private ComboBox<String> combobox2;
+    @FXML
+    private ComboBox<String> combobox3;
+    @FXML
+    private ComboBox<String> combobox4;
+    
+    //BOUTTONS CHOIX
+    @FXML
+    private Button playerHumain1;
+    @FXML
+    private Button playerHumain2;
+    @FXML
+    private Button playerIA1;
+    @FXML
+    private Button playerIA2;
+    //BOUTTONS VALIDATION
+    @FXML
+    private Button validationH1;
+    @FXML
+    private Button validationH2;
+    @FXML
+    private Button validationIA1;
+    @FXML
+    private Button validationIA2;
+    //Recommencer
+    @FXML
+    private Button recommencer1;
+    @FXML
+    private Button recommencer2;
+    //ZONE SAISIT
+    @FXML
+    private TextField zoneDeSaisie1;
+    @FXML
+    private TextField zoneDeSaisie2;
+    
+    @FXML
+    private TextArea communication;
+    @FXML
+    private Button archiver;
+    @FXML
+    private Button archiveOUI;
+    @FXML
+    private Button archiveNON;
+    @FXML
+    private Button validerArchive;
+    @FXML
+    private Label archiveMessage;
+    @FXML
+    private TextField zonesaisieArchive;
+    
+    @FXML
+    private Label player1Name;
+    @FXML
+    private Label player2Name;
+    @FXML
+    private Label player1Score;
+    @FXML   
+    private Label player2Score;
+    
+    
+    @FXML
+    private ImageView plateauIA1;
+    @FXML
+    private Region plaTeauIA1;
+    @FXML
+    private ImageView plateauIA2;
+    @FXML
+    private Region plaTeauIA2;
+    
+    @FXML
+    private Button Continue1;
+    
+    @FXML
+    private Button nbQuartDeOui;
+    @FXML
+    private Button nbQuartDeNon;
+    
+    @FXML
+    private ImageView lectureInterface;
+    @FXML
+    private Region lectureInterfaceG;
+
+    
+    /**
+     * Initialise le sogo
+     * @param affichage
+     * @param input
+     */
+    public void setSogo(Affichage affichage, Input input){
+        this.joueur1 = null;
+        this.joueur2 = null;
+        this.joueurActuel = null;
+        this.affichage = affichage;
+        this.plateau = new Plateau(4, 4, 4);
+        this.input = input;
+    }
+    /**
+     * Initialise le sogo tournant
+     * @param affichage
+     * @param input
+     * @param plateau
+     */
+    public void setSogoTournant(Affichage affichage, Input input, PlateauTournant plateau){
+        this.affichage = affichage;
+        this.input = input;
+        this.plateau = plateau;
+    }
+    /**
+     * Sert à la Sauvegarde des données de la partie dans sa situation actuelle.
+     * @param plateau
+     * @param joueur1
+     * @param joueur2
+     * @param joueurActuel
+     * @param affichage
+     * @param input
+     * @param nombreDePions
+     * @param nbPartiesGagneesJoueur1
+     * @param nbPartiesGagneesJoueur2
+     */
+    public void setSauveOBJ(Plateau plateau, Joueur joueur1, Joueur joueur2, Joueur joueurActuel
+            ,Affichage affichage,Input input,int nombreDePions, int nbPartiesGagneesJoueur1, int nbPartiesGagneesJoueur2){
+        this.plateau = plateau;
+        this.joueur1 = joueur1;
+        this.joueur2 = joueur2;
+        this.joueurActuel = joueurActuel;
+        this.affichage = affichage;
+        this.input = input;
+        this.nombreDePions = nombreDePions;
+        this. nbPartiesGagneesJoueur1 =  nbPartiesGagneesJoueur1;
+        this.nbPartiesGagneesJoueur2 = nbPartiesGagneesJoueur2;
+    }
+
+    /**
+     *Getters/Setters
+     */
+    public Plateau getPlateau(){
+        return plateau;
+    }
+    /**
+     * On active les champs nécéssaires selon le choix de l'utilisateur.
+     * @param event
+     */
+    public void activeZone(MouseEvent event){
+        partieInterface.active(event);
+    }
+    /**
+     * Joue la partie en entière
+     * @param event
+     */
+    public void deroulement(ActionEvent event){
+        joueurActuel = ((this.joueurActuel==null)?joueur2:changerJoueurActuel(this.joueurActuel));
+        String typePartie = partieTerminal.getTypeDePartie();
+        switch(typePartie){
+            case "Terminal" :
+                initialiserJoueurs((partieTerminal.getTypeDePartie().equals("Terminal"))?null:event);
+            case "Interface":
+                initialiserJoueurs((partieTerminal.getTypeDePartie().equals("Terminal"))?null:event);
+                if(joueur1 == null || joueur2 == null){return ;}
+                sogo.joueur1 = joueur1;sogo.joueur2 = joueur2;
+                break;
+        }
+        joueurActuel = changerJoueurActuel(joueurActuel);
+        sogo.joueurActuel = joueurActuel;
+        jouerNouvellePartie(event);
+        return;
+    }
+    /**
+     * Initialise les joueurs de la partie
+     * @param  event
+     */
+    public void initialiserJoueurs(ActionEvent event){
+        String typePartie = partieTerminal.getTypeDePartie();
+        String choice = "";
+        try{
+            typePartie  = ((Button) event.getSource()).getId();
+        }catch(Exception e){
+            //choix partie Interface
+        }
+        switch(typePartie){
+            case "Terminal" :
+                joueur1 = ((this.joueur1 == null)?partieTerminal.buildPlayer(null):this.joueur1);
+                joueur2 = ((this.joueur2 == null)?partieTerminal.buildPlayer(null):this.joueur2);
+                break;
+            case "validationH1" :
+                joueur1 =  partieInterface.buildPlayerInter(event);
+                break;
+            case "validationH2" :
+                joueur2 =  partieInterface.buildPlayerInter(event);
+                break;
+            case "validationIA1" :
+                joueur1 =  partieInterface.buildPlayerInter(event);
+                break;
+            case "validationIA2" :
+                joueur2 =  partieInterface.buildPlayerInter(event);
+                break;
+            case "Continue2":
+                joueur1 = this.joueur1;
+                joueur2 = this.joueur2;
+                break;
+            case "lectureValidation" :
+                joueur1 =  partieInterface.buildPlayerInter(event);
+                joueur2 =  partieInterface.buildPlayerInter(event);
+            default :
+                break;
+                
+        }
+        
+    }
+    /**
+     * Permet de jouer plusieurs partie de Sogo si les joueurs le souhaitent
+     */
+    public void jouerNouvellePartie(ActionEvent event){
+        boolean nouvellePartie = true;
+
+        //On lance la boucle du jeu
+        while(nouvellePartie){
+            boolean quitter = false;
+            String choice = partieTerminal.getTypeDePartie();
+            boolean cond = false;
+            while(!cond){
+                switch(choice){
+                    case "Interface" :
+                        choice = ((this instanceof SogoTournant)?"Tournant":"Simple");
+                    case "Tournant" :
+                        if(((Button) event.getSource()).getText().equals("Continue")||
+                          ((Button) event.getSource()).getText().equals("SOGO TOURNANT")||
+                          ((Button) event.getSource()).getText().equals("Valider")){
+                            sogo = this;
+                        }
+                        choice = "affiche le Plateau";
+                    case "Simple" :
+                        choice = "affiche le Plateau";break;
+                    case "affiche le Plateau":
+                        chargePlateauInterface(event);
+                        choice = "verifContinue";break;
+                    case "verifContinue" :
+                        if(partieInterface.getModeJeux().equals("ecriture")||
+                           partieInterface.getModeJeux().equals("continue")){
+                           activeCapteurJoueurActeul();return;
+
+                        }
+                        choice = "ActiveCapteursJeu";
+                    case "continue" :
+                        sogo = this;
+                        sogo.plateau.retabliPlateau();
+                        choice = "ActiveCapteursJeu";
+                    case "ActiveCapteursJeu" :
+                        activeCapteurJoueurActeul();return;
+                    case "Terminal" :
+                        cond = true;break;
+                }
+            }
+            jouerPartie(null);
+            
+            partieTerminal.archiverPartie(event);
+            partieTerminal.setFile((this instanceof SogoTournant)?"2":"1");
+            input.demanderNouvellePartie(null);
+            if(partieTerminal. getChoiceBoolean()){
+                reinitialiserPartie();
+            }else{
+                nouvellePartie = false;
+            }
+        }
+    }
+    /**
+     * Méthode pour afficher l'interface de jeu.
+     * @param event
+     */
+    public void chargePlateauInterface(ActionEvent event){
+
+        Node source = null;
+        Stage stage = null;
+        String choice = partieInterface.getModeJeux();
+        switch(choice){
+            case "lecture" : 
+                stage = partieInterface.getStage();
+                break;
+            case "ecriture" :
+                source = (Node)  event.getSource();
+                stage = (Stage) source.getScene().getWindow();
+                break;
+            case "continue" :
+                source = (Node)  event.getSource();
+                stage = (Stage) source.getScene().getWindow();
+                break;
+            case "continue1":
+                source = (Node)  event.getSource();
+                stage = (Stage) source.getScene().getWindow();
+                break;
+        }
+        Affichage affichage = new InterfaceGraphique();
+        stage.setWidth(1200);
+        stage.setHeight(650);
+        ((InterfaceGraphique)affichage).afficherPageInterface((sogo instanceof SogoTournant)?"Plateau2":"Plateau1",stage,1200,650);
+        initialiseInterfaceParametres(stage);
+    }
+    /**
+     * methode permettant l'initialisation des données du jeu
+     * @param stage définit la scene
+     * @return void
+     */
+    public void initialiseInterfaceParametres(Stage stage){
+        joueurDirectives(stage);
+        initialiseTableauDEJeu(stage);
+        configurationPartie(stage);
+            
+    }
+    /**
+     * méthode utilisée lors du premier lancement de la partie
+     * permattant l'interaction avec le premier joueur
+     * @param stage correspond à la scène actuelle
+     */
+    public void joueurDirectives(Stage stage){
+        String choiceParty = partieInterface.getModeJeux();
+        Node n = stage.getScene().lookup("#communication");
+        while(true){
+            switch (choiceParty){
+                case "continue1" :
+                    ((TextArea )n).setText("Joueur " + joueurActuel.getNom() + ", à vous de jouer \n");
+                    choiceParty = "Fin";break;
+                case "continue" :
+                    ((TextArea )n).setText("Joueur " + joueurActuel.getNom() + ", à vous de jouer \n");
+                    choiceParty = "Fin";break;
+                case "lecture" : 
+                    ((TextArea )n).setText("Partie en mode lecture cliquez progressivement sur le bouton play\n" + 
+                            "Joueur " + joueurActuel.getNom() + ", à vous de jouer \n");
+                    choiceParty = "Fin";break;
+                case "ecriture" : 
+                    ((TextArea )n).setText("Joueur " + joueurActuel.getNom() + ", à vous de jouer \n");
+                    choiceParty = "IA";break;
+                case "IA" :
+                    if(joueurActuel instanceof IA){((TextArea )n).appendText("Cliquez sur le bouton IA"+(joueurActuel.getId()+1)+"\n");}
+                    choiceParty = "Fin";break;
+                case "Fin" :
+                    return;
+            }
+        }
+    }
+    /**
+     * méthode permattant d'initialisé les noms et les scores des joueurs
+     * @param correspod à la scène
+     */
+    public void initialiseTableauDEJeu(Stage stage){
+        Node affichageNom1 = stage.getScene().lookup("#player1Name");
+        Node affichageNom2 = stage.getScene().lookup("#player2Name");
+        Node afficheScoreJ1 =  stage.getScene().lookup("#player1Score");
+        Node afficheScoreJ2 = stage.getScene().lookup("#player2Score");
+        int curs = 0;
+        switch(curs){
+            case 0 :
+                ((Label)affichageNom1).setText(joueur1.getNom());
+                curs++;
+            case 1:
+                ((Label)affichageNom2).setText(joueur2.getNom());
+                curs++;
+            case 2 :
+                ((Label)afficheScoreJ1).setText(Integer.toString(sogo.nbPartiesGagneesJoueur1));
+                curs++;
+            case 3 :
+                ((Label)afficheScoreJ2).setText(Integer.toString(sogo.nbPartiesGagneesJoueur2));
+                break;
+        }
+    }
+    /**
+     * méthode permettant l'activation ou la desactivation
+     * des capteurs en fonctions de la partie en cours
+     * @param stage correspond à la scene
+     */
+    public void configurationPartie(Stage stage){
+        Capteurs piliers = new Capteurs();
+        Node boutonPlay =  stage.getScene().lookup("#lectureInterface");
+        Node boutonP =  stage.getScene().lookup("#lectureInterfaceG");
+        
+        Node boutonIA1 =  stage.getScene().lookup("#plateauIA1");
+        Node boutonIA2 =  stage.getScene().lookup("#plateauIA2");
+        int curs =(partieInterface.getModeJeux().equals("lecture")?0:1);
+        
+        while(true){
+            switch(curs){
+                case 0 ://lecture
+                    piliers.desactiveCapteurs();
+                    ((ImageView)boutonPlay).setVisible(true);
+                    ((Region)boutonP).setVisible(true);
+                    curs = 5; break;
+                case 1 ://"ecriture" :
+                    if(joueur1 instanceof IA){
+                        curs++;break;
+                    }else{
+                        curs = 3;
+                    }break;
+                case 2 :
+                        ((ImageView)boutonIA1).setVisible(true);
+                        piliers.desactiveCapteurs();
+                        curs++;break;
+                case 3:
+                        if(joueur2 instanceof IA){
+                            curs = 4;
+                        }else{
+                            return;
+                        }
+                case 4 :
+                        ((ImageView)boutonIA2).setVisible(true);
+                        piliers.desactiveCapteurs();
+                        curs++;break;
+                case 5 :
+                        return;
+            }
+        }
+    }
+    /**
+     * Joue une partie de Sogo entièrement
+     */
+    public void jouerPartie(MouseEvent event){
+        String mode = partieTerminal.getModeJeux();
+        String typePartie = partieTerminal.getTypeDePartie();
+        do{
+            switch(typePartie){
+                case "Terminal":
+                    affichage.afficherPlateau(plateau);
+                    typePartie = "verifJoueur";
+                
+                case "verifJoueur" :
+                    if(joueurActuel instanceof IA){ralentiTime(2000);}
+                    typePartie = "verifmodelecture";
+                
+                case "verifmodelecture" :
+                    if(mode != null && mode.equals("lecture")){ralentiTime(4000);}
+                    typePartie = "joueurDirectives";
+                
+                case "joueurDirectives" :
+                    affichage.afficherMessage("Joueur " + joueurActuel.getNom() + ", à vous de jouer");
+                    typePartie = "PlacePion";
+                
+                case "Interface" :
+                    if(sogo instanceof SogoTournant){
+                        sogo.placerPion(event);
+                        if((new Listener()).getNbQuartDeTour() < 0){
+                            return;
+                        }
+                    }else{
+                        typePartie = "PlacePion";
+                    }
+                    
+                case "PlacePion":
+                    typePartie = partieTerminal.getTypeDePartie();
+                    if(!(typePartie.equals("Terminal"))&&!(sogo instanceof SogoTournant)){
+                        this.placerPion(event);
+                    }else if(typePartie.equals("Terminal")){this.placerPion(event);}
+                    joueurActuel = changerJoueurActuel(joueurActuel);
+                    typePartie = ((typePartie.equals("Terminal")?"TerminalControlePartie":"InterfaceControlePartie"));
+                
+                case "InterfaceControlePartie" :
+                    if(!verificationWinnerInterFace(nombreDePions,joueurActuel)){
+                        if(!joueurGagnant){
+                            activeCapteurJoueurActeul();
+                            desactiveCapteurJoueurEnAttente();
+                        }
+                        partieInterface.setNbQuartDeTour(-1);
+                        nombreDePions--;
+                        return;
+                    }
+                case "TerminalControlePartie" :
+                    joueurGagnant = plateau.verifierVictoire();
+                    nombreDePions--;
+                    typePartie = "Terminal";
+                    
+            }
+            
+        
+        }while(!joueurGagnant && nombreDePions > 0);
+        messageFinPartieTerminal();
+    }
+   /**
+    * méthode gérant les affichages de fin de partie en Terminal
+    */
+    public void messageFinPartieTerminal(){
+        String mode = partieTerminal.getModeJeux();
+        if(plateau.getVictoire(1) && plateau.getVictoire(2)){
+            affichage.afficherMessage("Match nul ! Un point pour les deux joueurs");
+            nbPartiesGagneesJoueur1++;
+            nbPartiesGagneesJoueur2++;
+        } else if(plateau.getVictoire(1)){
+            affichage.afficherMessage("Le joueur " + joueur1.getNom() + " a gagné !");
+            nbPartiesGagneesJoueur1++;
+        } else if(plateau.getVictoire(2)){
+            affichage.afficherMessage("Le joueur " + joueur2.getNom() + " a gagné !");
+            nbPartiesGagneesJoueur2++;
+        } else {
+            affichage.afficherMessage("Match nul !");
+        }
+
+        affichage.afficherPlateau(plateau);
+        if(mode != null && mode.equals("lecture")){
+            System.exit(0);
+        }
+        affichage.afficherMessage(joueur1.getNom() + " : " + nbPartiesGagneesJoueur1 + " | " + nbPartiesGagneesJoueur2 + " : " + joueur2.getNom());
+    }
+    /**
+     * méthode gérant les archiages des parties
+     * @param event correspond à l'action d'archivage en mode terminal
+     */
+    public void chargeArchive(MouseEvent event){
+        if(partieTerminal.getTypeDePartie().equals("Interface")){
+            sogo.nbPartiesGagneesJoueur1 = nbPartiesGagneesJoueur1;
+            sogo.nbPartiesGagneesJoueur2 = nbPartiesGagneesJoueur2;
+            chargePageVictoire(event);
+        }
+    }
+    
+    /**
+     * methode gérant l'affichage de la page d'archivage 
+     * de la partie
+     * @param event fait reference au bouton archive
+     * apparaissant en fin de partie
+     */
+    public void chargePageVictoire(MouseEvent event){
+        Node  source = (Node)  event.getSource(); 
+        Stage stage = (Stage) source.getScene().getWindow();
+        stage.setWidth(700);
+        stage.setHeight(400);
+        
+        Affichage affichage = new InterfaceGraphique();
+        ((InterfaceGraphique)affichage).afficherPageInterface("victoire",stage, 700,400);
+    }
+    /**
+     * fonction pour faire une pause dans le programme
+     * @param time
+     */
+    public void ralentiTime(int time){
+        try{
+            Thread.sleep(time);
+        }catch(InterruptedException e){
+            System.out.println("Ralentissement de l'execution du programme");
+        }
+    }
+    /**
+     * Gère les vérifications de victoire et intéragit avec les joueurs.
+     * @param nombreDePions
+     * @param joueurActuel
+     * @return
+     */
+    public boolean verificationWinnerInterFace(int nombreDePions, Joueur joueurActuel){
+        String typePartie = partieTerminal.getTypeDePartie();
+        boolean verif = false;
+        do{
+            switch(typePartie){
+                case "Terminal" : 
+                    return true;
+                case "Interface" :
+                    joueurGagnant = sogo.plateau.verifierVictoire();
+                    typePartie = ((!joueurGagnant && nombreDePions > 0)?"PoursuitPartie":"JoueurGagnant");
+                    if(typePartie.equals("JoueurGagnant")){return(messageFinInterface());}
+                
+                case "PoursuitPartie" :
+                    Stage stage = partieInterface.getStage();
+                    Node n = stage.getScene().lookup("#communication");
+                    ((TextArea )n).appendText("Joueur " + joueurActuel.getNom() + ", à vous de jouer \n");
+                    if(joueurActuel instanceof IA){((TextArea )n).appendText("Cliquez sur le bouton IA"+(joueurActuel.getId()+1)+"\n");}
+                    return false;
+            }
+        }while(!verif);
+        return true;
+    }
+    /**
+     * méthode gérant les affichages de fin de partie en Interface
+     */
+    
+    public boolean messageFinInterface(){
+        
+        try{
+            joueurActuel = changerJoueurActuel(joueurActuel);
+            Stage stage = partieInterface.getStage();
+            Node n = stage.getScene().lookup("#communication");
+            
+            if(sogo.plateau.getVictoire(1) && sogo.plateau.getVictoire(2)){
+                ((TextArea )n).appendText("Match nul ! Un point pour les deux joueurs");
+                nbPartiesGagneesJoueur1++;
+                nbPartiesGagneesJoueur2++;
+            
+            } else if(sogo.plateau.getVictoire(1)){
+                ((TextArea )n).appendText("Joueur " + joueurActuel.getNom() + ", a gagné !");
+                nbPartiesGagneesJoueur1++;
+            } else if(sogo.plateau.getVictoire(2)){
+                ((TextArea )n).appendText("Joueur " + joueurActuel.getNom() + ", a gagné !");
+                nbPartiesGagneesJoueur2++;
+            } else {
+                ((TextArea )n).appendText("Match nul !");
+            }
+            joueurActuel = changerJoueurActuel(joueurActuel);
+            //utile pour une partie avec une IA
+            if(!partieInterface.getModeJeux().equals("lecture")){
+                n = partieInterface.getStage().getScene().lookup("#archiver");
+                ((Button)n).setVisible(true);
+                if(partieInterface.getModeJeux().equals("continue")){
+                    ((Button)n).setDisable(true);
+                }
+                n = partieInterface.getStage().getScene().lookup("#Continue1");
+                ((Button)n).setVisible(true);
+                (new Capteurs()).desactiveCapteurs();
+                desactiveCapteurJoueurEnAttente();
+            }else{
+                n = stage.getScene().lookup("#lectureInterfaceG");
+                ((Region)n).setDisable(true);
+            }
+            return false;
+            
+        }catch(Exception e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+    
+    /**
+     * Place le pion sur le plateau, qu'il s'agisse d'une IA ou d'un humain.
+     * @param event
+     */
+    public void placerPion(MouseEvent event){
+        boolean placement = false;
+        Coordonnees coordonnees;
+        ScannerInput tmp = new ScannerInput();
+        String mode = tmp.getModeJeux();
+
+        while(!placement){
+            coordonnees = joueurActuel.demanderCoup(event,partieTerminal.getTypeDePartie().equals("Interface")?new Listener():new ScannerInput());
+            if(mode != null && mode.equals("lecture")){
+                affichage.afficherMessage(joueurActuel.getNom()+"("+((joueurActuel instanceof IA)?"IA":"Humain")+")"+" a joué en "+((char)(97+coordonnees.getX()))+(coordonnees.getY()+1));
+            }else if(partieInterface.getModeJeux().equals("lecture")){
+                Stage stage = partieInterface.getStage();
+                Node n = stage.getScene().lookup("#communication");
+                ((TextArea )n).appendText(joueurActuel.getNom()+"("+((joueurActuel instanceof IA)?"IA":"Humain")+")"+" a joué en "+((char)(97+coordonnees.getX()))+(coordonnees.getY()+1)+"\n");
+            }
+            
+            if(coordonnees.getX()== -1 && partieTerminal.getTypeDePartie().equals("Terminal")){
+                Sauvegarde obj1 = new Sauvegarde();
+                obj1.setSauveOBJ(typeSogoEnCours,plateau, joueur1, joueur2, joueurActuel, affichage, tmp, nombreDePions, nbPartiesGagneesJoueur1, nbPartiesGagneesJoueur2);
+                SerializeObjects obj = new SerializeObjects((this instanceof SogoTournant)?"2":"1");
+                obj.saveGame(obj1);//le sogo actuel
+                System.exit(0);
+            }
+            
+            try{
+                if( partieTerminal.getTypeDePartie().equals("Terminal")){
+                    plateau.placer(coordonnees, joueurActuel,"NONCALCUL");
+                }else if(partieTerminal.getTypeDePartie().equals("Interface") && this instanceof SogoTournant){
+                    this.plateau.placer(coordonnees, joueurActuel,"NONCALCUL");
+                    return;
+                }else{
+                    sogo.plateau.placer(coordonnees, joueurActuel,"NONCALCUL");
+                    return;
+                }
+                nombreDePions--;
+                placement = true;
+            } catch (ExceptionPilierRempli e){
+                affichage.afficherMessage(e.toString());
+            }
+        }
+    }
+
+    /**
+     * methode servant d'intermédiaire  
+     * avec la méthode archiverPartie de listener
+     * attend la réponse du joueur oui ou non
+     * @param event faisant reférence aux boutons oui || non de la page victoire
+     */
+    public void archivePartieInterface(ActionEvent event){
+        partieInterface.archiverPartie(event);
+    }
+    /**
+     * methode servant d'intermédiaire  
+     * avec la méthode confirmation de listener
+     * attend l'action du bouton validé
+     * @param event faisant reférence au bouton validé de la page victoire
+     */
+    public void archiveConfimation(ActionEvent event){
+        partieInterface.confirmation(event);
+    }
+    public void replayStart(ActionEvent event){
+        partieInterface.replayStart(event);
+        
+    }
+    /**
+     * Change le joueur actuel
+     * @param joueurActuel faisant reférance au joueurActuel
+     */
+  
+    public Joueur changerJoueurActuel(Joueur joueurActuel){
+        if(joueurActuel == joueur1){
+            return joueur2;
+        } else {
+            return joueur1;
+        }
+    }
+    /**
+     * methode permettant de réinitialiser les données d'un joueur
+     * lors des choix des joueurs
+     * @param event est associé aux boutons recommencer de la page players
+     */
+    public void recommencer(ActionEvent event){
+        String choice = ((Button) event.getSource()).getId();
+        if(choice.equals("recommencer1")){
+            joueur1 = null;
+            partieInterface.recommencer(choice,playerHumain1,playerIA1,zoneDeSaisie1,combobox1,combobox3);
+        }else if(choice.equals("recommencer2")){
+            joueur2 = null;
+            partieInterface.recommencer(choice,playerHumain2,playerIA2,zoneDeSaisie2,combobox2,combobox4);
+        }
+    }
+    public void backButton(ActionEvent event){
+        partieInterface.backButton(event);
+    }
+ 
+
+    /**
+     * Réinitialise le plateau de jeu et le nombre de pions de Sogo pour permettre à une nouvelle partie d'être lancée
+     */
+    public void reinitialiserPartie(){
+        joueurGagnant = false;
+        this.nombreDePions = 64;
+        this.plateau = new Plateau(4, 4, 4);
+    }
+    
+    /**
+     *variable utilisée pour intialisé le combobox compotement
+     *pour un joueur IA
+     */
+    ObservableList<String> options1 = FXCollections.observableArrayList(
+                                    "0","1","2","3"
+                                    );
+    /**
+     *variable utilisée pour intialisé le combobox profondeur
+     *pour un joueur IA
+     */
+    ObservableList<String> options2 = FXCollections.observableArrayList(
+                                    "egoïste", "agressif","intelligent"
+                                    );
+    /**
+     * méthode permettant l'initialisation
+     * de l'options1 et de l'options2
+     */
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+    try{
+        //4/4 combobox sont utlisés
+        combobox1.setItems(options1);
+        combobox2.setItems(options1);
+        combobox3.setItems(options2);
+        combobox4.setItems(options2);       
+    }catch(Exception e){
+        //0 combobox est utilisé 
+        //ou 2/4 combobox sont utilisés(partie avec L'IA)
+    }
+        
+    }
+    /**
+     * methode pour quitter la patier Interface
+     * faisant réference au bouton quitter du plateau
+     */
+    @FXML
+    public void exit(){
+        if(!joueurGagnant){
+            Sauvegarde obj1 = new Sauvegarde();
+            ScannerInput tmp = new ScannerInput();
+            obj1.setSauveOBJ(typeSogoEnCours,sogo.plateau, sogo.joueur1, sogo.joueur2, sogo.joueurActuel, sogo.affichage, tmp, sogo.nombreDePions, sogo.nbPartiesGagneesJoueur1, sogo.nbPartiesGagneesJoueur2);
+            SerializeObjects obj = new SerializeObjects((sogo instanceof SogoTournant)?"4":"3");
+            obj.saveGame(obj1);//le sogo actuel
+        }else{
+            partieInterface.clear((sogo instanceof SogoTournant)?"4":"3");
+        }
+        partieInterface.exit();
+    }
+    /**
+     *methode activant les capteurs d'un joueur
+     *le permettant ainsi de jouer son coup
+     */
+    public void activeCapteurJoueurActeul(){
+        Stage stage = partieInterface.getStage();
+        if(joueurActuel instanceof IA && joueurActuel == joueur1){
+            Node n = stage.getScene().lookup("#plaTeauIA1");
+            ((Region)n).setVisible(true);
+        }else if(joueurActuel instanceof IA && joueurActuel == joueur2){
+            Node n = stage.getScene().lookup("#plaTeauIA2");
+            ((Region)n).setVisible(true);
+        }else if(joueurActuel instanceof Humain){
+            (new Capteurs()).activeCapteurs();
+        }
+    }
+    /**
+     *methode desactivant les capteurs d'un joueur
+     *l'interdisant ainsi de jouer son coup
+     */
+    public void desactiveCapteurJoueurEnAttente(){
+        Stage stage = partieInterface.getStage();
+        if(joueurActuel == joueur1 && joueur2 instanceof IA){
+            Node n = stage.getScene().lookup("#plaTeauIA2");
+            ((Region)n).setVisible(false);
+            
+        }else if(joueurActuel == joueur2 && joueur1 instanceof IA){
+                    Node n = stage.getScene().lookup("#plaTeauIA1");
+                    ((Region)n).setVisible(false);
+            
+        }else if(!(joueurActuel  instanceof Humain)){
+            (new Capteurs()).desactiveCapteurs();
+        }
+    }
+    
+    /**
+     * classe gérant les pions du plateau en Interface
+     */
+    public class Pions implements Serializable{
+    
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    @FXML
+    private Sphere p000;
+    @FXML
+    private Sphere p001;
+    @FXML
+    private Sphere p002;
+    @FXML
+    private Sphere p003;
+        
+    @FXML
+    private Sphere p010;
+    @FXML
+    private Sphere p011;
+    @FXML
+    private Sphere p012;
+    @FXML
+    private Sphere p013;
+        
+    @FXML
+    private Sphere p020;
+    @FXML
+    private Sphere p021;
+    @FXML
+    private Sphere p022;
+    @FXML
+    private Sphere p023;
+        
+    @FXML
+    private Sphere p030;
+    @FXML
+    private Sphere p031;
+    @FXML
+    private Sphere p032;
+    @FXML
+    private Sphere p033;
+        
+        
+        
+        
+    @FXML
+    private Sphere p100;
+    @FXML
+    private Sphere p101;
+    @FXML
+    private Sphere p102;
+    @FXML
+    private Sphere p103;
+        
+    @FXML
+    private Sphere p110;
+    @FXML
+    private Sphere p111;
+    @FXML
+    private Sphere p112;
+    @FXML
+    private Sphere p113;
+        
+    @FXML
+    private Sphere p120;
+    @FXML
+    private Sphere p121;
+    @FXML
+    private Sphere p122;
+    @FXML
+    private Sphere p123;
+        
+    @FXML
+    private Sphere p130;
+    @FXML
+    private Sphere p131;
+    @FXML
+    private Sphere p132;
+    @FXML
+    private Sphere p133;
+        
+        
+
+    @FXML
+    private Sphere p200;
+    @FXML
+    private Sphere p201;
+    @FXML
+    private Sphere p202;
+    @FXML
+    private Sphere p203;
+        
+    @FXML
+    private Sphere p210;
+    @FXML
+    private Sphere p211;
+    @FXML
+    private Sphere p212;
+    @FXML
+    private Sphere p213;
+        
+    @FXML
+    private Sphere p220;
+    @FXML
+    private Sphere p221;
+    @FXML
+    private Sphere p222;
+    @FXML
+    private Sphere p223;
+        
+    @FXML
+    private Sphere p230;
+    @FXML
+    private Sphere p231;
+    @FXML
+    private Sphere p232;
+    @FXML
+    private Sphere p233;
+        
+        
+        
+        
+    @FXML
+    private Sphere p300;
+    @FXML
+    private Sphere p301;
+    @FXML
+    private Sphere p302;
+    @FXML
+    private Sphere p303;
+        
+    @FXML
+    private Sphere p310;
+    @FXML
+    private Sphere p311;
+    @FXML
+    private Sphere p312;
+    @FXML
+    private Sphere p313;
+        
+    @FXML
+    private Sphere p320;
+    @FXML
+    private Sphere p321;
+    @FXML
+    private Sphere p322;
+    @FXML
+    private Sphere p323;
+        
+    @FXML
+    private Sphere p330;
+    @FXML
+    private Sphere p331;
+    @FXML
+    private Sphere p332;
+    @FXML
+    private Sphere p333;
+                
+    }
+    /**
+     * classe gérant les zones d'action du joueur
+     * donc les piliers 
+     */
+    public class Capteurs implements Serializable{
+        @FXML
+        private Region a1;
+        @FXML
+        private Region a2;
+        @FXML
+        private Region a3;
+        @FXML
+        private Region a4;
+        
+        
+        @FXML
+        private Region b1;
+        @FXML
+        private Region b2;
+        @FXML
+        private Region b3;
+        @FXML
+        private Region b4;
+        
+        
+        @FXML
+        private Region c1;
+        @FXML
+        private Region c2;
+        @FXML
+        private Region c3;
+        @FXML
+        private Region c4;
+        
+        
+        
+        @FXML
+        private Region d1;
+        @FXML
+        private Region d2;
+        @FXML
+        private Region d3;
+        @FXML
+        private Region d4;
+        /**
+         * methode desactivant l'action 
+         * sur les piliers du plateau
+         */
+        public void desactiveCapteurs(){
+            Stage stage = partieInterface.getStage();
+            Node n = stage.getScene().lookup("#a1");
+            ((Region)n).setVisible(false);
+            n = stage.getScene().lookup("#a2");
+            ((Region)n).setVisible(false);
+            n = stage.getScene().lookup("#a3");
+            ((Region)n).setVisible(false);
+            n = stage.getScene().lookup("#a4");
+            ((Region)n).setVisible(false);
+            
+            n = stage.getScene().lookup("#b1");
+            ((Region)n).setVisible(false);
+            n = stage.getScene().lookup("#b2");
+            ((Region)n).setVisible(false);
+            n = stage.getScene().lookup("#b3");
+            ((Region)n).setVisible(false);
+            n = stage.getScene().lookup("#b4");
+            ((Region)n).setVisible(false);
+            
+            n = stage.getScene().lookup("#c1");
+            ((Region)n).setVisible(false);
+            n = stage.getScene().lookup("#c2");
+            ((Region)n).setVisible(false);
+            n = stage.getScene().lookup("#c3");
+            ((Region)n).setVisible(false);
+            n = stage.getScene().lookup("#c4");
+            ((Region)n).setVisible(false);
+            
+            n = stage.getScene().lookup("#d1");
+            ((Region)n).setVisible(false);
+            n = stage.getScene().lookup("#d2");
+            ((Region)n).setVisible(false);
+            n = stage.getScene().lookup("#d3");
+            ((Region)n).setVisible(false);
+            n = stage.getScene().lookup("#d4");
+            ((Region)n).setVisible(false);
+        }
+        /**
+         * methode activant l'action 
+         * sur les piliers du plateau
+         */
+        public void activeCapteurs(){
+            Stage stage = partieInterface.getStage();
+            Node n = stage.getScene().lookup("#a1");
+            ((Region)n).setVisible(true);
+            n = stage.getScene().lookup("#a2");
+            ((Region)n).setVisible(true);
+            n = stage.getScene().lookup("#a3");
+            ((Region)n).setVisible(true);
+            n = stage.getScene().lookup("#a4");
+            ((Region)n).setVisible(true);
+            
+            n = stage.getScene().lookup("#b1");
+            ((Region)n).setVisible(true);
+            n = stage.getScene().lookup("#b2");
+            ((Region)n).setVisible(true);
+            n = stage.getScene().lookup("#b3");
+            ((Region)n).setVisible(true);
+            n = stage.getScene().lookup("#b4");
+            ((Region)n).setVisible(true);
+            
+            n = stage.getScene().lookup("#c1");
+            ((Region)n).setVisible(true);
+            n = stage.getScene().lookup("#c2");
+            ((Region)n).setVisible(true);
+            n = stage.getScene().lookup("#c3");
+            ((Region)n).setVisible(true);
+            n = stage.getScene().lookup("#c4");
+            ((Region)n).setVisible(true);
+            
+            n = stage.getScene().lookup("#d1");
+            ((Region)n).setVisible(true);
+            n = stage.getScene().lookup("#d2");
+            ((Region)n).setVisible(true);
+            n = stage.getScene().lookup("#d3");
+            ((Region)n).setVisible(true);
+            n = stage.getScene().lookup("#d4");
+            ((Region)n).setVisible(true);
+        }
+    }
+
+}

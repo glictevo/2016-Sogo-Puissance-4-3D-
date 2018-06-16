@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="411.0" prefWidth="564.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.Listener">
+   <children>
+      <Button layoutX="172.0" layoutY="174.0" mnemonicParsing="false" onMouseClicked="#aide" text="SOGO SIMPLE" textFill="#f51212">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Button>
+      <Button layoutX="354.0" layoutY="174.0" mnemonicParsing="false" onMouseClicked="#aide" prefHeight="35.0" prefWidth="183.0" text="SOGO TOURNANT" textFill="#d71212">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Button>
+      <Label layoutX="94.0" layoutY="56.0" prefHeight="75.0" prefWidth="451.0" text="     SOGO-HELP" textFill="#e82f2f">
+         <font>
+            <Font name="System Bold Italic" size="60.0" />
+         </font>
+      </Label>
+      <Button layoutX="24.0" layoutY="361.0" mnemonicParsing="false" onAction="#backButton" text="&lt;">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+      </Button>
+   </children>
+</AnchorPane>

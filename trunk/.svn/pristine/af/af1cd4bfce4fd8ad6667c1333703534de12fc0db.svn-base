@@ -1,0 +1,797 @@
+package application;
+
+import java.io.File;
+import java.net.URL;
+import java.util.ResourceBundle;
+import java.util.Scanner;
+
+import com.sun.javafx.geom.Rectangle;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.PhongMaterial;
+import javafx.scene.shape.Sphere;
+import javafx.stage.Stage;
+
+public class Listener implements Input{
+	private static int curs = 0;
+	private static String mem = "";
+	
+
+
+	private static Write gameFile;//Écriture d'une partie dans un fichier
+	private static String filename;//correspond au nom du fichier
+	private static String modejeux ="";//lecture, ecriture ou continue
+	private static String typeDePartie;//Terminal ou Interface
+
+	
+	private static Affichage affichage;
+	private static Input input;
+	
+	private static int choiceInt = 0;
+	
+	private static Joueur joueurTmp;//Joueur en cours de création
+	private static Coordonnees coordschoice;//variable utilisé pour les choix des coordonnées d'un joueur
+	
+	private static Sogo sogo;
+	
+	private static String playerName1 = null;
+	
+	private static String playerName2 = null;
+	
+	@FXML
+	private static String profondeur1 = null;
+	@FXML
+	private static String comportement1 = null;
+	@FXML
+	private static String profondeur2 = null;
+	@FXML
+	private static String comportement2 = null;
+	@FXML
+	private Button Continue2;
+	
+	@FXML
+	private Label ContinuePartieCommunication;
+	
+	@FXML
+    private TextArea lectureLSFichier;
+	@FXML
+	private Label lectureCommunication;
+	@FXML
+	private Button lectureValidation;
+	@FXML
+    private TextField lectureZoneDeSaisie;
+	
+	
+	//utiliser pour l'update de l'interface
+	private static int update = 0;
+
+	private static Stage stage;
+	
+	private static Parent root;
+	
+	private static int nbQuartDeTour = -1;
+
+	
+	public Sogo getSogo(){
+		return sogo;
+	}
+	public Write getFile(){
+		return gameFile;
+	}
+	public String getModeJeux(){
+		return modejeux;
+	}
+	public String getFileName(){
+		return filename;
+	}
+
+	public void setRoot(Parent root){
+		this.root = root;
+	}
+	public Stage getStage(){
+		return stage;
+	}
+	public void setStage(Stage stage){
+		this.stage = stage;
+	}
+	
+	public int getNbQuartDeTour(){
+		return nbQuartDeTour;
+	}
+	public void setNbQuartDeTour(int nbQuartDeTour){
+		this.nbQuartDeTour = nbQuartDeTour;
+	}
+	
+	public void demanderTypePartie(ActionEvent event){
+		Node  source = (Node)  event.getSource(); 
+		stage = (Stage) source.getScene().getWindow();
+		String choice = ((Button) event.getSource()).getText();
+		Scene scene = null;
+		try{
+			if(choice.equals("Start")){
+				root  = FXMLLoader.load(getClass().getResource("/application/FXMLFILE/menu3.fxml"));
+			}else if(choice.equals("Read")){
+				root  = FXMLLoader.load(getClass().getResource("/application/FXMLFILE/lecture.fxml"));
+			}else if(choice.equals("Continue")){
+				modejeux = "continue";
+				root  = FXMLLoader.load(getClass().getResource("/application/FXMLFILE/continue.fxml"));
+			}
+			scene = new Scene(root,700,400);
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			stage.setScene(scene);
+			stage.show();
+			if(choice.equals("Read")){
+				lsFichiers(null);
+			}
+		}catch(Exception e){
+			System.out.println("Test : choix TypePartie");
+		}
+	}
+
+	public void demanderSogo(ActionEvent event){
+		Node  source = (Node)  event.getSource(); 
+		stage = (Stage) source.getScene().getWindow();
+		String choice = ((Button) event.getSource()).getText();
+		Scene scene = null;
+		try{
+			if(choice.equals("SOGO SIMPLE")){
+				//Suppression de la partie sauvegardée
+				clear("3");
+                File f = new File("Tmp3.txt");//Remet l'écriture de la partie à 0
+                f.delete();//Remet l'écriture de la partie à 0 
+                gameFile = new Write("3");//Création d'un nouveau fichier pour la sauvegarde
+                gameFile.write("Sogo : simple");
+                sogo = new Sogo();
+                sogo.setSogo(affichage, input);
+                modejeux = "écriture";
+				root  = FXMLLoader.load(getClass().getResource("/application/FXMLFILE/players.fxml"));
+			}else if(choice.equals("SOGO TOURNANT")){
+				clear("4");
+                File f = new File("Tmp4.txt");
+                f.delete();
+                gameFile = new Write("4");
+                gameFile.write("Sogo : Tournant");
+                sogo = new SogoTournant(affichage, input);
+                modejeux = "écriture";
+                root  = FXMLLoader.load(getClass().getResource("/application/FXMLFILE/players.fxml"));
+                
+			}
+			scene = new Scene(root,700,400);
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			stage.setScene(scene);
+			stage.show();
+		}catch(Exception e){
+			System.out.println("Chargement Sogo en cours");
+		}
+	}
+
+	public Joueur buildPlayerInter(ActionEvent event){
+		demanderJoueur(event);
+		return joueurTmp;
+	}
+	public void demanderJoueur(ActionEvent event){
+		if(modejeux != null && modejeux.equals("lecture")){
+			construitJoueurModeLecture(event);
+			return;
+		}
+		String choice = ((Button) event.getSource()).getId();
+		Node source = null;
+		if(choice.equals("validationH1")){
+			recupereJoueurDonnees(choice,1);
+		}else if(choice.equals("validationH2")){
+			recupereJoueurDonnees(choice,2);
+			return;
+		}else if(choice.equals("validationIA1")){
+			recupereJoueurDonnees(choice,1);
+			return;
+		}else if(choice.equals("validationIA2")){
+			recupereJoueurDonnees(choice,2);
+			return;
+		}
+		
+	}
+	public void recupereJoueurDonnees(String choice, int numJoueur){
+		Node source = null;
+		if(choice.equals("validationH1")||choice.equals("validationH2")){
+			source = stage.getScene().lookup((numJoueur == 1)?"#zoneDeSaisie1":"#zoneDeSaisie2");
+			if(choice.equals("validationH1")){
+				playerName1 =((TextField)source).getText();
+			}else{
+				playerName2 =((TextField)source).getText();
+			}
+			
+			gameFile.write("TypeJoueur : Humain");
+			gameFile.write((numJoueur == 1) ?"Joueur1" +"nom : "+((numJoueur == 1)?playerName1:playerName2) :"Joueur2" +"nom : " +((numJoueur == 1)?playerName1:playerName2));
+			joueurTmp = new Humain((numJoueur == 1)?playerName1:playerName2,new ScannerInput());
+			
+			((TextField)source).setText("Votre nom");
+			((TextField)source).setDisable(true);
+			source = stage.getScene().lookup((numJoueur == 1)?"#validationH1":"#validationH2");
+			((Button)source).setDisable(true);
+			return;
+		}else if (choice.equals("validationIA1")||choice.equals("validationIA2")){
+			String comportementmp = null;
+			String profondeurtmp = null;
+			source = stage.getScene().lookup((numJoueur == 1)?"#combobox1":"#combobox2");
+			profondeurtmp =((ComboBox<String>)source).getValue();
+			source = stage.getScene().lookup((numJoueur == 1)?"#combobox3":"#combobox4");
+			comportementmp =((ComboBox<String>)source).getValue();
+			
+			if(choice.equals("validationIA1")){
+				profondeur1 = profondeurtmp;
+				comportement1 = comportementmp;
+			}else{
+				profondeur2 = profondeurtmp;
+				comportement2 = comportementmp;
+			}
+			gameFile.write("TypeJoueur : IA");
+			gameFile.write("Profondeur : "+profondeurtmp);
+			gameFile.write("TypeComportement : "+comportementmp);
+			gameFile.write((numJoueur == 1)?"Joueur1" +"nom : " + "Irobot1":"Joueur1" +"nom : " + "Irobot2");
+			
+			source = stage.getScene().lookup((numJoueur == 1)?"#combobox1":"#combobox2");
+			((ComboBox<String>)source).setDisable(true);
+			source = stage.getScene().lookup((numJoueur == 1)?"#combobox3":"#combobox4");
+			((ComboBox<String>)source).setDisable(true);
+			source = stage.getScene().lookup((numJoueur == 1)?"#validationIA1":"#validationIA2");
+			((Button)source).setDisable(true);
+			joueurTmp = new IA((numJoueur == 1)?"Irobot1":"Irobot2",Integer.parseInt(profondeur1),comportement(comportement1));
+		}
+	}
+	public void construitJoueurModeLecture(ActionEvent event){
+		int numJoueur = ((choiceInt%2==0)?1:2);
+	    choiceInt++;
+	    int typeJoueur = demanderHumainOuIA(event);
+	    if(typeJoueur == 0){ //Humain
+	      Joueur j = new Humain(recupererNom(affichage, numJoueur,gameFile,modejeux, filename), new ScannerInput());
+	      mem += j.getNom() + " ";
+	      curs++;
+	      //Partie Humain contre Humain
+	      if(curs == 4){
+	        String[] tab = mem.split(" ");
+	        try{
+	          Thread.sleep(6000);
+	        }catch(InterruptedException e){
+	          System.out.println("Test en cours");
+	        }
+	        curs = 0;
+	        mem = "";
+	      }
+	      //IA vs Humain
+	      if(curs == 6){
+	        String[] tab = mem.split(" ");
+	        try{
+	          Thread.sleep(6000);
+	        }catch(InterruptedException e){
+	          System.out.println("Test en cours");
+	        }
+	        curs = 0;
+	        mem = "";
+	      }
+
+	      //Avant return j;
+	      joueurTmp = j;
+	      return;
+	    } else { //IA
+	      int profondeur = demanderProfondeur(affichage,gameFile,modejeux,filename);
+	      int typeComportement = demanderTypeComportement(affichage,gameFile,modejeux,filename);
+	      Joueur j = new IA(recupererNom(affichage, numJoueur, gameFile,modejeux, filename)
+	    		  , profondeur, typeComportement);
+	      mem += j.getNom()+" ";
+	      curs++;
+	      //IA VS IA
+	      if(curs == 8){
+	        String [] tab = mem.split(" ");
+	      try{
+	          Thread.sleep(6000);
+	        }catch(InterruptedException e){
+	          System.out.println("Test en cours");
+	        }
+	        curs = 0;
+	        mem = "";
+	      }
+
+	      //Humain VS IA
+	      if(curs == 6){
+	        String[] tab = mem.split(" ");
+	        try{
+	          Thread.sleep(6000);
+	        }catch(InterruptedException e){
+	          System.out.println("Test en cours");
+	        }
+	        curs = 0;
+	        mem = "";
+	      }
+	      //Avant return j;
+	      joueurTmp = j;
+	      return;
+	    }
+		
+	}
+	public int demanderHumainOuIA(ActionEvent event){
+		int numJoueur = ((choiceInt%2==0)?1:2);
+	    Scanner sc = new Scanner(System.in);
+	    boolean surete = false;
+	    String reponse = "";
+	    if(modejeux != null && modejeux.equals("lecture")){
+	      Read lire = new Read();
+	      mem += lire.readLine(filename)+ " ";
+	      String[] tab = mem.split(" ");
+	      reponse = ((tab[curs].equals("IA"))?"1":"0");
+	      curs++;
+	      return (Integer.parseInt(reponse));
+	    }
+	    return 0;
+	}
+	public int demanderProfondeur(Affichage affichage,Write file,String mode,String nomfichier){
+	    Scanner sc = new Scanner(System.in);
+	    boolean surete = false;
+	    int reponse = -1;
+	    if(mode != null && mode.equals("lecture")){
+	      Read lire = new Read();
+	      mem  += lire.readLine(nomfichier) + " ";
+	      String[] tab = mem.split(" ");
+	      reponse = Integer.parseInt(tab[curs]);
+	      curs++;
+	      return reponse;
+	    }
+	    return 0;
+	}
+	 public int demanderTypeComportement(Affichage affichage,Write file,String mode,String nomfichier){
+		    Scanner sc = new Scanner(System.in);
+		    String[] tab = {"egoïste","agressif","intelligent"};
+		    boolean surete = false;
+		    int reponse = -1;
+		    if(mode != null && mode.equals("lecture")){
+		      Read lire = new Read();
+		      mem += lire.readLine(nomfichier)+ " ";
+		      String[] tmp = mem.split(" ");
+		      reponse = localise(tmp[curs],tab);
+		      curs++;
+		      return reponse;
+		    }
+		    return 0;
+	 }
+	public void turnPion(String choix,int joueurnum){
+		Node n = stage.getScene().lookup("#"+choix);//ref Pions
+		((Sphere)n).setOpacity(1);
+		((Sphere)n).setMaterial(appliqueTexture(joueurnum+1));
+		update();
+	}
+	public PhongMaterial appliqueTexture(int joueurnum){
+		PhongMaterial material = new PhongMaterial();
+		if(joueurnum == 1){
+			material.setDiffuseColor(Color.DARKBLUE);
+			material.setSpecularColor(Color.WHITE);
+		}else if (joueurnum == 2){
+			material.setDiffuseColor(Color.DARKRED);
+			material.setSpecularColor(Color.WHITE);
+		}else{
+			Image diffuseMap = new Image("/application/Pictures/im.png");
+			material.setDiffuseMap(diffuseMap);
+		}
+		return material;
+		
+	}
+	
+	public void recommencer(String choice,Button b1,Button b2,TextField zone,ComboBox<String> combobox1,ComboBox<String> combobox2){
+		if(choice.equals("recommencer1")){
+			playerName1 = null;
+			profondeur1 = null;
+			comportement1 = null;
+			zone.setEditable(false);
+			combobox1.setDisable(true);
+			combobox2.setDisable(true);
+			b1.setDisable(false);
+			b2.setDisable(false);
+		}else if(choice.equals("recommencer2")){
+			playerName2 = null;
+			profondeur2 = null;
+			comportement2 = null;
+			zone.setEditable(false);
+			combobox1.setDisable(true);
+			combobox2.setDisable(true);
+			b1.setDisable(false);
+			b2.setDisable(false);
+		}
+	}
+	public void update(){
+		if(update%2 == 0){
+			stage.setWidth(1201);
+			update += 1;
+		}else{
+			stage.setWidth(1200);
+			update = 0;
+		}
+	}
+	public void clear(String file){
+		File f = new File("Partie"+file+".ser");
+	    f.delete();
+	}
+	public void exit(){
+		System.exit(0);
+	}
+	public void replayStart(ActionEvent event){
+		if(sogo instanceof SogoTournant){
+			((SogoTournant)sogo).reinitialiserPartie();
+			this.modejeux = "contine";
+		}else{
+			sogo.reinitialiserPartie();
+			this.modejeux = "continue";
+		}
+		sogo.deroulement(event);
+	}
+	public void archiverPartie(ActionEvent event){
+		String choice = ((Button) event.getSource()).getText();
+		Node n = null;
+		if(choice.equals("Oui")){
+			n = stage.getScene().lookup("#archiveOUI");
+			((Button)n).setDisable(true);
+			n = stage.getScene().lookup("#archiveNON");
+			((Button)n).setDisable(true);
+			n = stage.getScene().lookup("#zonesaisieArchive");
+			((TextField)n).setVisible(true);
+			n = stage.getScene().lookup("#archiveMessage");
+			((Label)n).setText("Nommez votre fichier");
+			((Label)n).setVisible(true);
+			n = stage.getScene().lookup("#validerArchive");
+			((Button)n).setVisible(true);
+		}else{
+			replay(event);
+		}
+	}
+	public void confirmation(ActionEvent event){
+		Node  source = (Node)  event.getSource();
+		Node n = null;
+		n = stage.getScene().lookup("#zonesaisieArchive");
+		String nomfichier = ((TextField)n).getText();
+		boolean surete = false;
+	    String reponse = "";
+	    File repertoire = new File("Archives");
+	    if (!repertoire.exists()) {
+	  	    try{
+	  	    	repertoire.mkdir();
+	  	    } catch(SecurityException se){
+	  	    	System.out.println("Erreur lors de la création du dossier Archives");
+	  	    }        
+	   	}
+	    File[] files=repertoire.listFiles();
+	    boolean existe = false;
+	    for(int i = 1; i < files.length; i++){
+	    	if((nomfichier+".txt").equals(files[i].getName())){
+	    		existe = true;
+	        }
+	    }
+	    if(existe){
+	    	n = stage.getScene().lookup("#archiveMessage");
+	    	((Label)n).setText("Nom existant, choisissez un autre nom");
+	    	return;
+	    }
+	    File f = new File(gameFile.getName());
+	    f.renameTo(new File("Archives//"+nomfichier+".txt"));
+	    replay(event);
+	}
+	public void replay(ActionEvent event){
+		Node  source = (Node)  event.getSource(); 
+		stage = (Stage) source.getScene().getWindow();
+		String choice = ((Button) event.getSource()).getText();
+		Scene scene = null;
+		try{
+			root  = FXMLLoader.load(getClass().getResource("/application/FXMLFILE/replay.fxml"));
+			scene = new Scene(root,700,400);
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			stage.setScene(scene);
+			stage.show();
+		}catch(Exception e){
+			System.out.println("replay choice");
+		}
+	}
+	public void demanderNbQuartDeTour(MouseEvent event,Joueur j){
+		Read lire = new Read();
+		if(modejeux.equals("lecture")){
+			nbQuartDeTour = Integer.parseInt(lire.readLine(filename));
+		    return;
+		}
+		Node  source = (Node)  event.getSource();
+		String choice = ((Node) event.getSource()).getId();
+		if(!(choice.equals("nbQuartDeOui"))&&!(choice.equals("nbQuartDeNon"))){
+			Node n = stage.getScene().lookup("#communication");
+			((TextArea )n).appendText("Voulez-vous tourner le plateau \nd'un quart de tour ? \n(sens horaire) (oui/non)\n");
+			n = stage.getScene().lookup("#nbQuartDeOui");
+			((Button)n).setDisable(false);
+			((Button)n).setVisible(true);
+			n = stage.getScene().lookup("#nbQuartDeNon");
+			((Button)n).setDisable(false);
+			((Button)n).setVisible(true);
+			return;
+		}
+		if(choice.equals("nbQuartDeOui")){
+			nbQuartDeTour = 1;
+			gameFile.write(j.getNom()+" nbQuartDeTour : "+ nbQuartDeTour);
+			source =  stage.getScene().lookup("#nbQuartDeOui");
+			((Button)source).setDisable(true);
+			source =  stage.getScene().lookup("#nbQuartDeNon");
+			((Button)source).setDisable(true);
+		} else {
+			nbQuartDeTour = 0;
+			gameFile.write(j.getNom()+" nbQuartDeTour : "+ nbQuartDeTour);
+			source =  stage.getScene().lookup("#nbQuartDeNon");
+			((Button)source).setDisable(true);
+			source =  stage.getScene().lookup("#nbQuartDeOui");
+			((Button)source).setDisable(true);
+		}
+    }
+    
+	public void backButton(ActionEvent event){
+		Node  source = (Node)  event.getSource(); 
+		stage = (Stage) source.getScene().getWindow();
+		String choice = ((Button) event.getSource()).getText();
+		Scene scene = null;
+		try{
+			if(choice.equals("<")){
+				root  = FXMLLoader.load(getClass().getResource("/application/FXMLFILE/menu1.fxml"));
+			}else if(choice.equals("<<")){
+				root  = FXMLLoader.load(getClass().getResource("/application/FXMLFILE/menu2.fxml"));
+			}else if(choice.equals("SOGO SIMPLE")){
+				root  = FXMLLoader.load(getClass().getResource("/application/FXMLFILE/players.fxml"));
+			}
+			scene = new Scene(root,700,400);
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			stage.setScene(scene);
+			stage.show();
+		}catch(Exception e){
+			System.out.println("Back button Exception");
+		}
+	}
+	public void demanderVersion(ActionEvent event){
+		Node  source = (Node)  event.getSource(); 
+		stage = (Stage) source.getScene().getWindow();
+		String choice = ((Button) event.getSource()).getText();
+		Scene scene = null;
+		try{
+			if(choice.equals("Interface")){
+				root  = FXMLLoader.load(getClass().getResource("/application/FXMLFILE/menu2.fxml"));
+			}else if(choice.equals("Terminal")){
+				Runnable tache =  new MonRunnable();
+				Thread thread = new Thread(tache);
+				thread.start();
+				((Node)(event.getSource())).getScene().getWindow().hide();
+			}
+			scene = new Scene(root,700,400);
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			stage.setScene(scene);
+			stage.show();
+		}catch(Exception e){
+			System.out.println("Test : Interface ou Terminal en cours");
+		}
+	}
+	public void active(MouseEvent event){
+		Node  source = (Node) event.getSource(); 
+		stage = (Stage) source.getScene().getWindow();
+		String choice = ((Region) event.getSource()).getId();
+		if(choice.equals("playerHumain1") && playerName1 == null){
+			activeZonePLAYERS(choice,1);
+		}else if(choice.equals("playerHumain2") && playerName2 == null){
+			activeZonePLAYERS(choice,2);
+		}else if(choice.equals("playerIA1")&& profondeur1 == null && comportement1 == null){
+			activeZonePLAYERS(choice,1);
+		}else if(choice.equals("playerIA2")&& profondeur2 == null && comportement2 == null){
+			activeZonePLAYERS(choice,2);
+		}
+	}
+	
+	public void activeZonePLAYERS(String choice,int numJoueur){
+		Node source = null;
+		if(choice.equals("playerHumain1")||choice.equals("playerHumain2")){
+			//active partie Humain
+			source = stage.getScene().lookup((numJoueur == 1)?"#playerHumain1":"#playerHumain2");
+			((Button)source).setDisable(true);
+			source = stage.getScene().lookup((numJoueur == 1)?"#zoneDeSaisie1":"#zoneDeSaisie2");
+			((TextField)source).setDisable(false);
+			((TextField)source).setEditable(true);
+			source = stage.getScene().lookup((numJoueur == 1)?"#validationH1":"#validationH2");
+			((Button)source).setDisable(false);
+			
+			//desactive partie IA
+			source = stage.getScene().lookup((numJoueur == 1)?"#playerIA1":"#playerIA2");
+			((Button)source).setDisable(true);
+			source = stage.getScene().lookup((numJoueur == 1)?"#combobox1":"#combobox2");
+			((ComboBox<String>)source).setDisable(true);
+			source = stage.getScene().lookup((numJoueur == 1)?"#combobox3":"#combobox4");
+			((ComboBox<String>)source).setDisable(true);
+			source = stage.getScene().lookup((numJoueur == 1)?"#validationIA1":"#validationIA2");
+			((Button)source).setDisable(true);
+			return;
+		}else if(choice.equals("playerIA1")||choice.equals("playerIA2")){
+			//active partie IA
+			source = stage.getScene().lookup((numJoueur == 1)?"#playerIA1":"#playerIA2");
+			((Button)source).setDisable(true);
+			source = stage.getScene().lookup((numJoueur == 1)?"#combobox1":"#combobox2");
+			((ComboBox<String>)source).setDisable(false);
+			source = stage.getScene().lookup((numJoueur == 1)?"#combobox3":"#combobox4");
+			((ComboBox<String>)source).setDisable(false);
+			source = stage.getScene().lookup((numJoueur == 1)?"#validationIA1":"#validationIA2");
+			((Button)source).setDisable(false);
+			
+			//desactive partie Humain
+			source = stage.getScene().lookup((numJoueur == 1)?"#playerHumain1":"#playerHumain2");
+			((Button)source).setDisable(true);
+			source = stage.getScene().lookup((numJoueur == 1)?"#zoneDeSaisie1":"#zoneDeSaisie2");
+			((TextField)source).setDisable(true);
+			source = stage.getScene().lookup((numJoueur == 1)?"#validationH1":"#validationH2");
+			((Button)source).setDisable(true);
+		}
+	}
+	@FXML
+	public void suitePartie(ActionEvent event){
+		String choice = ((Button) event.getSource()).getText();
+		DeserializeObjects obj = new DeserializeObjects();
+		Sauvegarde save = null;
+		if(choice.equals("SOGO SIMPLE")){
+			save = obj.suiteGame("Partie3.ser");
+			gameFile = new Write("3");
+	    	
+		}else if(choice.equals("SOGO TOURNANT")){
+			save = obj.suiteGame("Partie4.ser");
+			gameFile = new Write("4");
+		}
+		if(save != null){
+			sogo = save.sogoEtatOrigine();
+			modejeux = "continue";
+			sogo.deroulement(event);
+		}
+	}
+
+	public int comportement(String comportement){
+		if(comportement.equals("egoïste")){
+			return 1;
+		}else if(comportement.equals("agressif")){
+			return 2;
+		}else{
+			return 3;
+		}
+	}
+
+	public Coordonnees donneCoordonnees(MouseEvent event, Joueur j) {
+		if(modejeux.equals("lecture")){
+			 recupererCoordonnees(event,j);
+			 return coordschoice;
+		}
+		Node  source = (Node)  event.getSource(); 
+		stage = (Stage) source.getScene().getWindow();
+		String choice = ((Region) event.getSource()).getId();
+		gameFile.write(j.getNom()+" : "+conversCoord(choice).getX()+"," + conversCoord(choice).getY());
+	    coordschoice   = conversCoord(choice);
+	    return (conversCoord(choice));
+	}
+
+	public Coordonnees conversCoord(String str){
+	    int x = Character.getNumericValue(str.charAt(0))-10;
+	    int y = Integer.parseInt(str.charAt(1)+"")-1;
+	    return(new Coordonnees(x,y));
+	}
+	
+	public void recupererCoordonnees(MouseEvent event,Joueur j){
+		Read lire = new Read();
+	    String[] str1 = (lire.readLine(filename)).split(",");
+		coordschoice = new Coordonnees(Integer.parseInt(str1[0]),Integer.parseInt(str1[1]));
+		return;
+	}
+
+	public String recupererNom(Affichage affichage, int joueur, Write file, String mode,String nomfichier){
+		if(mode != null && mode.equals("lecture")){
+		      Read lire = new Read();
+		      return(lire.readLine(nomfichier));
+		}
+		return "";
+	}
+
+	public boolean demanderNouvellePartie(Affichage affichage,String file){
+		return true;
+	}
+	public int localise(String chaine,String[]str){
+		return 0;
+	}
+	@Override
+	public void demanderNouvellePartie(ActionEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void lsFichiers(ActionEvent event) {
+		Node n = null;
+		File repertoire = new File("Archives");
+		File[] files  =repertoire.listFiles();
+		int count = 0;
+		if(files.length == 1){
+			n = stage.getScene().lookup("#lectureCommunication");
+			((Label)n).setText("Archives vide");
+			n = stage.getScene().lookup("#lectureValidation");
+			((Button)n).setDisable(true);
+			n = stage.getScene().lookup("#lectureZoneDeSaisie");
+			((TextField)n).setDisable(true);
+			return;
+		}
+		liste(files,affichage);
+		if(event == null){
+			n = stage.getScene().lookup("#lectureCommunication");
+			((Label)n).setText("Choisissez un fichier parmis la liste");
+			n = stage.getScene().lookup("#lectureValidation");
+			((Button)n).setDisable(false);
+			n = stage.getScene().lookup("#lectureZoneDeSaisie");
+			((TextField)n).setDisable(false);
+			return;
+		}
+		n = stage.getScene().lookup("#lectureZoneDeSaisie");
+		String reponse = ((TextField)n).getText();
+		if(repCorrect(files,reponse)){
+			filename = "Archives//"+reponse;
+			Read lire= new Read();
+			String rep = lire.readLine(filename);
+			if(rep.equals("simple")){
+				sogo = new Sogo();
+		        sogo.setSogo(affichage, input);
+			}else{
+		        sogo = new SogoTournant(affichage,input);
+		    }
+			modejeux ="lecture";
+	        sogo.deroulement(null);
+		}else{
+			n = stage.getScene().lookup("#lectureCommunication");
+			((Label)n).setText("Veuillez rentrer un nom correct");
+		}
+		
+	}
+	public void liste(File[] files, Affichage affichage){
+		Node n = stage.getScene().lookup("#lectureLSFichier");
+		String fileListe = "";
+	    for(int i = 1; i < files.length; i++){
+	    	fileListe += files[i].getName()+"\n";
+	    }
+	    ((TextArea)n).setText(fileListe);
+	}
+	public boolean repCorrect(File[] files,String reponse){
+	    for(int i = 1; i < files.length; i++){
+	      if((reponse).equals(files[i].getName())){
+	        return true;
+	      }
+	    }
+	    return false;
+	  }
+
+	@Override
+	public void setFile(String file) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean getChoiceString() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	@Override
+	public int demandeQuartDeTour(MouseEvent event, Joueur j) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
+}

@@ -1,0 +1,891 @@
+/**
+  * Cette classe gère les actions d'un joueur de type IA
+  * Les fonctions sont donc adaptées à l'utilisation du jeu par
+  * une intelligence artificielle
+  */
+
+public class IA extends Joueur{
+
+  /**
+    * L'attribut tourner sert à savoir si l'IA doit analyser une nouvelle
+    * fois le plateau, mais cette fois-ci tourné d'un quart de tour
+    * Quant aux autres attributs, ils servent à déterminer les points que
+    * chaque action possible donne à un coup.
+    * Ces valeurs sont initialisées par les fonctions initComportement 1,2 et 3
+    * Par exemple : bloque3 aura pour valeur le nombre de points attribués
+    * lorsque l'IA, en placant un pion à un certain endroit, bloquera une ligne
+    * où l'adversaire avait 3 pions d'alignés
+    */
+  private boolean tourner;
+
+  //Pour la fonction evaluation()
+  private int bloque1;
+  private int bloque2;
+  private int bloque3;
+  private int ligne1;
+  private int ligne2;
+  private int ligne3;
+  private int ligne4;
+  private int profondeur;
+
+  /**
+    * Constructeur d'une IA
+    * @param nom le nom pour l'IA
+    * @param profondeur le nombre de coup successifs de l'IA analysés
+    * @param comportement le type de comportement voulu (1 "egoïste", 2 "agressif", 3 "intelligent")
+    */
+  public IA(String nom, int profondeur, int comportement){
+    super(nom, null);
+
+    this.profondeur = profondeur*2; //*2 car on évalue le coup de l'IA ET de l'adversaire
+    this.tourner = true;
+
+    if(comportement == 1) {
+      initComportement1();
+    } else if(comportement == 2){
+      initComportement2();
+    } else {
+      initComportement3();
+    }
+  }
+
+  /**
+    * Initialise les points pour les coups pour le comportement 1: defensif (voir travail du lundi 29 fevrier pour detail des points)
+    */
+  private void initComportement1(){
+    this.bloque1 = 10;
+    this.bloque2 = 80;
+    this.bloque3 = 327680;
+    this.ligne1 = 640;
+    this.ligne2 = 5120;
+    this.ligne3 = 40960;
+    this.ligne4 = 2621440;
+  }
+
+  /**
+    * Initialise les points pour les coups pour le comportement 2: agresif (voir travail du lundi 29 fevrier pour detail des points)
+    */
+  private void initComportement2(){
+    this.bloque1 = 80;
+    this.bloque2 = 40960;
+    this.bloque3 = 327680;
+    this.ligne1 = 10;
+    this.ligne2 = 640;
+    this.ligne3 = 5120;
+    this.ligne4 = 2621440;
+  }
+
+  /**
+    * Initialise les points pour les coups pour le comportement 3: Intelligent (voir travail du lundi 29 fevrier pour detail des points)
+    */
+  private void initComportement3(){
+    this.bloque1 = 10;
+    this.bloque2 = 80;
+    this.bloque3 = 327680;
+    this.ligne1 = 10;
+    this.ligne2 = 80;
+    this.ligne3 = 640;
+    this.ligne4 = 2621440;
+  }
+
+  /**
+    * Demande à l'IA si elle veut effectuer un quart de tour
+    * Cette information est contenue et mise à jour dans le programme avec
+    * la variable booléenne tourner
+    * Les paramètres file, mode et nomfichier permettent d'enregistrer ou de lire
+    * le fait que l'IA ait effectué un quart de tour à ce moment là du jeu
+    * @param plateau le plateau de jeu sur lequel le joueur joue
+    * @param affichage l'affichage pour les messages et autres à l'écran
+    * @param file le fichier où on écrit la partie (ou on la lit)
+    * @param j le joueur à qui on demande si il veut faire un quart de tour
+    * @param mode le mode (lecture ou écriture) du fichier
+    * @param nomfichier nom du fichier où on écrit la partie (ou qu'on la lit)
+    * @return le nombre de quart de tour que le joueur souhaite effectuer (0 ou 1)
+    */
+  public int demanderNbQuartDeTour(Plateau plateau, Affichage affichage, Write file, Joueur j, String mode, String nomfichier){
+    if(tourner){
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+
+  /**
+    * Fonction de l'IA annalysant le plateau de jeu à profondeur 0
+    * et retournant les coordonnees où elle place son pion
+    * Appelle evaluation() ppour évaluer la valeur d'un coup
+    * Appelle analyse() pour analyser les prochain coups si la profondeur est plus grande que 0
+    * Les paramètres file, mode et nomfichier permettent d'enregistrer ou de lire
+    * les coups joués par le joueur dans des fonctions appellées dans cette fonction
+    * @param plateau le plateau de jeu sur lequel le joueur joue
+    * @param affichage l'affichage pour les messages et autres à l'écran
+    * @param file le fichier où on écrit la partie (ou on la lit)
+    * @param mode le mode (lecture ou écriture) du fichier
+    * @param nomfichier nom du fichier où on écrit la partie (ou qu'on la lit)
+    * @return les coordonnees où le joueur veut placer son pion
+    */
+  public Coordonnees demanderCoup(Plateau plateau, Affichage affichage, Write file, String mode, String nomfichier){
+    int max = -3000000;
+    int valeur = 0;
+    int valeur2 = 0;
+    Coordonnees coordonnees = new Coordonnees(-1, -1);
+    int profondeurInitiale = this.profondeur;
+    boolean plateauTournant = plateau instanceof PlateauTournant;
+
+    //On remet tourner à false, comme on demande un nouveau coup
+    this.tourner = false;
+
+    //Si on est en train de lire la partie dans un fichier, on renvoie la prochaine ligne
+    if(mode.equals("lecture")){
+      String[] str1 = null;
+      Read lire = new Read();
+      str1 = (lire.readLine(nomfichier)).split(",");
+
+      return (new Coordonnees(Integer.parseInt(str1[0]), Integer.parseInt(str1[1])));
+    }
+
+    //Parcours toutes les positions du plateau possible
+    for (int i = 0; i < plateau.getPlateau().length; i++){
+      for (int j = 0; j < plateau.getPlateau()[i].length ; j++) {
+        try{
+          //On place le pion temporairement...
+          plateau.placer(new Coordonnees(i, j), this);
+
+          //On fait l'évaluation du coup
+          valeur = evaluation(plateau, new Coordonnees(i, j), true);
+
+          //Si la profondeur est 0 et si le coup que vient de jouer l'IA n'est pas un coup gagnant
+          if(profondeur > 0 && valeur < 2621440){
+            this.profondeur--;
+            valeur += analyse(plateau, false);
+            this.profondeur = profondeurInitiale;
+          }
+
+          if (valeur > max){
+            max = valeur;
+            coordonnees = new Coordonnees(i, j);
+          }
+
+          //... On retire le pion placé temporairement
+          plateau.retirerPion(i, j);
+        } catch(ExceptionPilierRempli e){
+          //On ne fait rien si le pilier est rempli
+        }
+      }
+    }
+
+    //Si on joue avec SogoTournant et si il reste des quarts de tour à l'IA
+    if(plateauTournant && ((PlateauTournant)plateau).getNbQuartDeTourJoueur(this.getId()) > 0){
+      ((PlateauTournant)plateau).tournerCentre();
+
+      //Parcours toutes les position du plateau possible
+      for (int i = 0; i < plateau.getPlateau().length; i++){
+        for (int j = 0; j < plateau.getPlateau()[i].length ; j++) {
+          try{
+            int k = -1;
+            int l = -1;
+
+            //On place le pion temporairement...
+            plateau.placer(new Coordonnees(i, j), this);
+
+            //On fait l'évaluation du coup
+            valeur = evaluation(plateau, new Coordonnees(i, j), true);
+
+            //Si la profondeur est 0 et si le coup que vient de jouer l'IA n'est pas un coup gagnant
+            if(profondeur > 0 && valeur < 2621440){
+              //On retire un quart de tour avant de lancer une nouvelle analyse...
+              ((PlateauTournant)plateau).setNbQuartDeTourJoueur(this.getId(), ((PlateauTournant)plateau).getNbQuartDeTourJoueur(this.getId()) - 1);
+              this.profondeur--;
+              valeur += analyse(plateau, false);
+              this.profondeur = profondeurInitiale;
+              //...Puis on la rétablit
+              ((PlateauTournant)plateau).setNbQuartDeTourJoueur(this.getId(), ((PlateauTournant)plateau).getNbQuartDeTourJoueur(this.getId()) + 1);
+            }
+
+            if (valeur > max){
+              max = valeur;
+
+              //Comme on tourne, les coordonnees du placement sont celles avant de tourner le plateau
+              if(i == 1 && j == 1){
+                k = 1;
+                l = 2;
+              } else if(i == 1 && j == 2){
+                k = 2;
+                l = 2;
+              } else if(i == 2 && j == 2){
+                k = 2;
+                l = 1;
+              } else if(i == 2 && j == 1){
+                k = 1;
+                l = 1;
+              } else {
+                k = i;
+                l = j;
+              }
+
+              //k et l les coordonnées où il faut placer le pion avant de tourner le centre
+              coordonnees = new Coordonnees(k, l);
+              this.tourner = true;
+            }
+
+            //... On retire le pion placé temporairement
+            plateau.retirerPion(i, j);
+          } catch(ExceptionPilierRempli e){
+            //On ne fait rien
+          }
+        }
+      }
+      //On remet en place le plateau comme avant en le tournant
+      for(int i = 0; i < 3; i++){
+        ((PlateauTournant)plateau).tournerCentre();
+      }
+    }
+
+    //On écrit dans le fichier le coup qui vient d'être joué
+    file.write(this.getNom() + " : " + coordonnees.getX() + "," + coordonnees.getY());
+
+    return coordonnees;
+  }
+
+  /**
+    * Analyse les coups de l'IA ou ceux de son adversaire
+    * @param plateau le plateau du jeu sur lequel le joueur joue
+    * @param bool true si c'est l'IA qu'on analyse, false si c'est l'adversaire qu'on analyse
+    * @return la valeur du meilleur coup possible
+    */
+  public int analyse(Plateau plateau, boolean bool){
+    int max = -3000000;
+    int min = 3000000; //Plus que la valeur de coup maximale possible
+    int valeur = 0;
+    Coordonnees coordonnees = new Coordonnees(-1, -1);
+    int profondeurInitiale = this.profondeur;
+    boolean plateauTournant = plateau instanceof PlateauTournant;
+    int idJoueurActuel = 0;
+
+    //On trouve l'id du joueur qui joue
+    if(!bool){
+      if(this.getId() == 0){
+        idJoueurActuel = 1;
+      } else {
+        idJoueurActuel = 0;
+      }
+    } else {
+      idJoueurActuel = this.getId();
+    }
+
+    //Parcours toutes les position possible du plateau
+    for (int i = 0; i < plateau.getPlateau().length; i++){
+      for (int j = 0; j < plateau.getPlateau()[i].length ; j++) {
+        try{
+          //On place le pion temporairement...
+          //Si on est avec l'IA (bool == true)
+          if(bool){
+            plateau.placer(new Coordonnees(i, j), this);
+          } else{
+            //Sinon on créé un joueur temporaire
+            //On peut se permettre de faire ça car on teste juste à chaque fois
+              //si le pion auquel appartient le joueur est l'IA ou pas
+            plateau.placer(new Coordonnees(i, j), new Humain("TmpPlayer", new ScannerInput()));
+          }
+
+          //On évalue le coup placé
+          valeur = evaluation(plateau, new Coordonnees(i, j), bool);
+
+          //On continue d'appeler analyse s'il reste de la profondeur et si le coup n'est pas gagnant
+          if(profondeur > 0 && valeur > -2621440 && valeur < 2621440) {
+            this.profondeur--;
+            if(bool){ //si c'était l'IA qui était analysée ...
+              valeur += analyse(plateau, false); //... on analyse son adversaire maintenant...
+            } else { //... et inversement
+              valeur += analyse(plateau, true);
+            }
+            this.profondeur = profondeurInitiale;
+          }
+
+          if(bool){
+            //Si on analyse pour l'IA, on prend le max
+            if (valeur > max){
+              max = valeur;
+              coordonnees = new Coordonnees(i, j);
+            }
+          } else {
+            //Sinon, on analyse pour son adversaire, du coup on prend le min
+            if(valeur < min){
+              min = valeur;
+              coordonnees = new Coordonnees(i, j);
+            }
+          }
+
+          //... On retire le pion placé temporairement
+          plateau.retirerPion(i, j);
+        } catch(ExceptionPilierRempli e){
+          //On ne fait rien
+        }
+      }
+    }
+
+    //Si on joue avec SogoTournant et si il reste des quarts de tour au joueur dont on évalue le coup
+    if(plateauTournant && ((PlateauTournant)plateau).getNbQuartDeTourJoueur(idJoueurActuel) > 0){
+      ((PlateauTournant)plateau).tournerCentre();
+
+      //Parcours toutes les positions possible du plateau
+      for (int i = 0; i < plateau.getPlateau().length; i++){
+        for (int j = 0; j < plateau.getPlateau()[i].length ; j++) {
+          try{
+            //On place le pion temporairement...
+            plateau.placer(new Coordonnees(i, j), this);
+
+            //On fait l'évaluation du coup
+            valeur = evaluation(plateau, new Coordonnees(i, j), true);
+
+            //Si la profondeur est 0 et si le coup que vient de jouer l'IA n'est pas un coup gagnant
+            if(profondeur > 0 && valeur < 2621440){
+              //On retire un quart de tour avant de lancer une nouvelle analyse...
+              ((PlateauTournant)plateau).setNbQuartDeTourJoueur(idJoueurActuel, ((PlateauTournant)plateau).getNbQuartDeTourJoueur(idJoueurActuel) - 1);
+              if(bool){ //si c'était l'IA qui était analysée ...
+                valeur += analyse(plateau, false); //... on analyse son adversaire maintenant...
+              } else { //... et inversement
+                valeur += analyse(plateau, true);
+              }
+              //...Puis on rétablit le nombre de quart de tours restant du joueur
+              ((PlateauTournant)plateau).setNbQuartDeTourJoueur(idJoueurActuel, ((PlateauTournant)plateau).getNbQuartDeTourJoueur(idJoueurActuel) + 1);
+            }
+
+            if (valeur > max){
+              int k;
+              int l;
+
+              max = valeur;
+
+              //Comme on tourne, les coordonnees du placement sont celles avant de tourner le plateau
+              if(i == 1 && j == 1){
+                k = 1;
+                l = 2;
+              } else if(i == 1 && j == 2){
+                k = 2;
+                l = 2;
+              } else if(i == 2 && j == 2){
+                k = 2;
+                l = 1;
+              } else {
+                k = 1;
+                l = 1;
+              }
+
+              //k et l les coordonnées où il faut placer le pion avant de tourner le centre
+              coordonnees = new Coordonnees(k, l);
+            }
+
+            //... On retire le pion placé temporairement
+            plateau.retirerPion(i, j);
+          } catch(ExceptionPilierRempli e){
+            //On ne fait rien
+          }
+        }
+      }
+      //Si c'est un plateau tournant, on remet en place ce qu'on a tourné
+      if(plateauTournant){
+        for(int i = 0; i < 3; i++){
+          ((PlateauTournant)plateau).tournerCentre();
+        }
+      }
+    }
+
+    if(bool){
+      //Si on analyse pour l'IA, on renvoie le max
+      return max;
+    } else {
+      //Sinon, on analyse pour son adversaire, du coup on renvoie le min
+      return min;
+    }
+  }
+
+  /**
+    * Evalue la valeur du coup à une coordonnée
+    * Utilise les attributs de la classe pour savoir la valeur des coups selon le comportement
+    * La valeur renvoyée est positive si on évalue le coup de l'IA
+    * sinon ele est négative pour l'adversaire
+    * @param plateau le plateau de jeu
+    * @param coordonnees les coordonnees où on évalue le placement
+    * @param bool true si le joueur est l'IA, false si c'est l'adversaire qu'on évalue
+    * @return la valeur de l'evaluation si le pion est placé à ces coordonnées (positive si on évalue le coup de l'IA, négative sinon)
+    */
+  public int evaluation(Plateau plateau, Coordonnees coordonnees, boolean bool){
+    int X = coordonnees.getX();
+    int Y = coordonnees.getY();
+    int Z = plateau.getPlateau()[0][0].length-1; // on se place en haut du plateau
+
+    //On récupère Z
+		while (plateau.getPion(X, Y, Z) == null){
+			//On descend le pilier jusqu'à trouver un pion, qui est logiquement le dernier joué.
+			Z--;
+		}
+
+    int sommeEvaluation = 0;
+
+    //Le reste est des appels aux différentes fonctions d'évaluations
+    sommeEvaluation += evaluationVerticale(plateau, bool, X, Y);
+    sommeEvaluation += evaluationHorizontale(plateau, bool, X, Y, Z);
+
+    if(X + Z == 3) {
+      sommeEvaluation += evalutationDiagonaleTrancheX(plateau, bool, Y);
+    }
+    if(X == Z) {
+      sommeEvaluation += evaluationDiagonaleXZ(plateau, bool, Y);
+    }
+    if(Y + Z == 3){
+      sommeEvaluation += evalutationDiagonaleTrancheY(plateau, bool, X);
+    }
+    if(X + Y == 3) {
+      sommeEvaluation += evaluationDiagonaleTrancheZ(plateau, bool, Z);
+    }
+    if (Y == Z){
+      sommeEvaluation += evaluationDiagonaleYZ(plateau, bool, X);
+    }
+    if(X == Y){
+      sommeEvaluation += evaluationDiagonaleXY(plateau, bool, Z);
+    }
+    if(X == Y && Z == 3 - X){
+      sommeEvaluation += evaluationDiagonaleDiagonaleXY(plateau, bool);
+    }
+    if(X == Z && Y == 3 - X){
+      sommeEvaluation += evaluationDiagonaleDiagonaleXZ(plateau, bool);
+    }
+    if(Y == Z && X == 3 - Y){
+      sommeEvaluation += evaluationDiagonaleDiagonaleYZ(plateau, bool);
+    }
+    if(X == Y && Y == Z){
+      sommeEvaluation += evaluationDiagonaleDiagonaleXYZ(plateau, bool);
+    }
+
+    //TODO : mettre en paramètre le randomness ?
+
+    //Si on évalue un coup de l'IA, la valeur renvoyée est positive
+    if(bool){
+      return sommeEvaluation + ((int) (Math.random() * 9));
+    } else {
+      //Sinon elle est négative
+      return -sommeEvaluation - ((int) (Math.random() * 9));
+    }
+  }
+
+  /**
+    * Attribut le nombre de points selon les nombre de pions du joueur
+    * évalue et du nombre de pions de l'adversaire du joueur évalué
+    * @param nbPionsJoueurEvalue le nombre de pions du joueur évalué
+    * @param nbPionsAdversaire le nombre de pions de l'adversaire du joueur évalué
+    * @return le nombre de points sur la ligne
+    */
+    public int attributionPointsV2(int nbPionsJoueurEvalue, int nbPionsAdversaire){
+    int nbPoints = 0;
+
+    switch(nbPionsJoueurEvalue) {
+      case 1 :
+        if(nbPionsAdversaire == 0) {
+          nbPoints += ligne1;
+        }
+        break;
+      case 2 :
+        if(nbPionsAdversaire == 0) {
+          nbPoints += ligne2;
+        }
+        break;
+      case 3 :
+        if(nbPionsAdversaire == 0) {
+          nbPoints += ligne3;
+        }
+        break;
+      case 4 :
+        nbPoints += ligne4;
+        break;
+    }
+
+    switch(nbPionsAdversaire) {
+      case 1 :
+        if(nbPionsJoueurEvalue == 1){
+          nbPoints += bloque1;
+        }
+        break;
+      case 2 :
+        if(nbPionsJoueurEvalue == 1){
+          nbPoints += bloque2;
+        }
+        break;
+      case 3 :
+        nbPoints += bloque3;
+        break;
+    }
+
+    return nbPoints;
+  }
+
+  /**
+    * Evalue la ligne verticale par rapport au pion posé
+    * @param plateau le plateau du jeu
+    * @bool true si on évalue l'IA, false si on évalue l'adversaire
+    * @param x la coordonnée x du dernier pion placé
+    * @param y la coordonnée y du dernier pion placé
+    * @return la valeur de la ligne
+    */
+  public int evaluationVerticale(Plateau plateau, boolean bool, int x, int y){
+    int nbPionsJoueurEvalue = 0;
+    int nbPionsAdversaire = 0;
+
+
+    for(int z = 0; z < 4; z++) {
+      Plateau.Pion pion = plateau.getPion(x, y, z);
+
+      if(pion != null) {
+        Joueur joueur = pion.getJoueur();
+
+        if((bool && joueur == this) || (!bool && joueur != this)) {
+          nbPionsJoueurEvalue++;
+        } else {
+          nbPionsAdversaire++;
+        }
+      }
+    }
+
+    return attributionPointsV2(nbPionsJoueurEvalue, nbPionsAdversaire);
+  }
+
+  /**
+    * Evalue les lignes horizontales par rapport au pion posé
+    * @param plateau le plateau du jeu
+    * @bool true si on évalue l'IA, false si on évalue l'adversaire
+    * @param x la coordonnée x du dernier pion placé
+    * @param y la coordonnée y du dernier pion placé
+    * @param z la coordonnée z du dernier pion placé
+    * @return la valeur de la ligne
+    */
+  public int evaluationHorizontale(Plateau plateau, boolean bool,int x, int y, int z){ //Vérifie sur X et Y horizontalement
+    int nbPionsJoueurEvalue = 0;
+    int nbPionsAdversaire = 0;
+
+
+    //On fait la première attribution de points en regardant la ligne des X
+    for(int i = 0; i < 4; i++){
+      Plateau.Pion pion = plateau.getPion(i, y, z);
+
+      if(pion != null){
+        Joueur joueur = pion.getJoueur();
+
+        if((bool && joueur == this) || (!bool && joueur != this)){
+          nbPionsJoueurEvalue++;
+        } else {
+          nbPionsAdversaire++;
+        }
+      }
+    }
+
+    int attribution1 = attributionPointsV2(nbPionsJoueurEvalue, nbPionsAdversaire);
+
+    nbPionsJoueurEvalue = 0;
+    nbPionsAdversaire = 0;
+
+    //On fait la deuxième attribution de points en regardant la ligne des Y
+    for(int i = 0; i < 4; i++){
+      Plateau.Pion pion = plateau.getPion(x, i, z);
+
+      if(pion != null){
+        Joueur joueur = pion.getJoueur();
+
+        if((bool && joueur == this) || (!bool && joueur != this)){
+          nbPionsJoueurEvalue++;
+        } else {
+          nbPionsAdversaire++;
+        }
+      }
+    }
+
+    return attribution1 + attributionPointsV2(nbPionsJoueurEvalue, nbPionsAdversaire);
+  }
+
+  /**
+    * Evalue une des diagonales du plateau par rapport au pion posé
+    * @param plateau le plateau du jeu
+    * @bool true si on évalue l'IA, false si on évalue l'adversaire
+    * @param y la coordonnée y du dernier pion placé
+    * @return la valeur de la ligne
+    */
+  public int evalutationDiagonaleTrancheX(Plateau plateau, boolean bool,int y){
+    int nbPionsJoueurEvalue = 0;
+    int nbPionsAdversaire = 0;
+
+
+    for(int x = 0; x < 4; x++){
+      int z = 3 - x;
+
+      Plateau.Pion pion = plateau.getPion(x, y, z);
+
+      if(pion != null) {
+        Joueur joueur = pion.getJoueur();
+
+        if((bool && joueur == this) || (!bool && joueur != this)){
+          nbPionsJoueurEvalue++;
+        } else {
+          nbPionsAdversaire++;
+        }
+      }
+    }
+
+    return attributionPointsV2(nbPionsJoueurEvalue, nbPionsAdversaire);
+  }
+
+  /**
+    * Evalue une des diagonales du plateau par rapport au pion posé
+    * @param plateau le plateau du jeu
+    * @bool true si on évalue l'IA, false si on évalue l'adversaire
+    * @param x la coordonnée x du dernier pion placé
+    * @return la valeur de la ligne
+    */
+  public int evalutationDiagonaleTrancheY(Plateau plateau, boolean bool,int x){
+    int nbPionsJoueurEvalue = 0;
+    int nbPionsAdversaire = 0;
+
+    for(int y = 0; y < 4; y++){
+      int z = 3 - y;
+
+      Plateau.Pion pion = plateau.getPion(x, y, z);
+
+      if(pion != null){
+        Joueur joueur = pion.getJoueur();
+
+        if((bool && joueur == this) || (!bool && joueur != this)){
+          nbPionsJoueurEvalue++;
+        } else {
+          nbPionsAdversaire++;
+        }
+      }
+    }
+
+    return attributionPointsV2(nbPionsJoueurEvalue, nbPionsAdversaire);
+  }
+
+  /**
+    * Evalue une des diagonales du plateau par rapport au pion posé
+    * @param plateau le plateau du jeu
+    * @bool true si on évalue l'IA, false si on évalue l'adversaire
+    * @param z la coordonnée z du dernier pion placé
+    * @return la valeur de la ligne
+    */
+  public int evaluationDiagonaleTrancheZ(Plateau plateau, boolean bool,int z){
+    int nbPionsJoueurEvalue = 0;
+    int nbPionsAdversaire = 0;
+
+    for(int x = 0; x < 4; x++){
+      int y = 3 - x;
+
+      Plateau.Pion pion = plateau.getPion(x, y, z);
+
+      if(pion != null) {
+        Joueur joueur = pion.getJoueur();
+
+        if((bool && joueur == this) || (!bool && joueur != this)){
+          nbPionsJoueurEvalue++;
+        } else {
+          nbPionsAdversaire++;
+        }
+      }
+    }
+
+    return attributionPointsV2(nbPionsJoueurEvalue, nbPionsAdversaire);
+  }
+
+  /**
+    * Evalue une des diagonales du plateau par rapport au pion posé
+    * @param plateau le plateau du jeu
+    * @bool true si on évalue l'IA, false si on évalue l'adversaire
+    * @param y la coordonnée y du dernier pion placé
+    * @return la valeur de la ligne
+    */
+  public int evaluationDiagonaleXZ(Plateau plateau, boolean bool,int y){
+    int nbPionsJoueurEvalue = 0;
+    int nbPionsAdversaire = 0;
+
+    for(int x = 0; x < 4; x++){
+      Plateau.Pion pion = plateau.getPion(x, y, x);
+
+      if(pion != null){
+        Joueur joueur = pion.getJoueur();
+
+        if((bool && joueur == this) || (!bool && joueur != this)){
+          nbPionsJoueurEvalue++;
+        } else {
+          nbPionsAdversaire++;
+        }
+      }
+    }
+
+    return attributionPointsV2(nbPionsJoueurEvalue, nbPionsAdversaire);
+  }
+
+  /**
+    * Evalue une des diagonales du plateau par rapport au pion posé
+    * @param plateau le plateau du jeu
+    * @bool true si on évalue l'IA, false si on évalue l'adversaire
+    * @param x la coordonnée x du dernier pion placé
+    * @return la valeur de la ligne
+    */
+  public int evaluationDiagonaleYZ(Plateau plateau, boolean bool,int x){
+    int nbPionsJoueurEvalue = 0;
+    int nbPionsAdversaire = 0;
+
+    for(int y = 0; y < 4; y++){
+      Plateau.Pion pion = plateau.getPion(x, y, y);
+
+      if(pion != null){
+        Joueur joueur = pion.getJoueur();
+
+        if((bool && joueur == this) || (!bool && joueur != this)){
+          nbPionsJoueurEvalue++;
+        } else {
+          nbPionsAdversaire++;
+        }
+      }
+    }
+
+    return attributionPointsV2(nbPionsJoueurEvalue, nbPionsAdversaire);
+  }
+
+  /**
+    * Evalue une des diagonales du plateau par rapport au pion posé
+    * @param plateau le plateau du jeu
+    * @bool true si on évalue l'IA, false si on évalue l'adversaire
+    * @param z la coordonnée z du dernier pion placé
+    * @return la valeur de la ligne
+    */
+  public int evaluationDiagonaleXY(Plateau plateau, boolean bool,int z){
+    int nbPionsJoueurEvalue = 0;
+    int nbPionsAdversaire = 0;
+
+    for(int x = 0; x < 4; x++){
+      Plateau.Pion pion = plateau.getPion(x, x, z);
+      if(pion != null){
+        Joueur joueur = pion.getJoueur();
+
+        if((bool && joueur == this) || (!bool && joueur != this)){
+          nbPionsJoueurEvalue++;
+        } else {
+          nbPionsAdversaire++;
+        }
+      }
+    }
+
+    return attributionPointsV2(nbPionsJoueurEvalue, nbPionsAdversaire);
+  }
+
+  /**
+    * Evalue une des diagonales du plateau par rapport au pion posé
+    * @param plateau le plateau du jeu
+    * @bool true si on évalue l'IA, false si on évalue l'adversaire
+    * @return la valeur de la ligne
+    */
+  public int evaluationDiagonaleDiagonaleXY(Plateau plateau, boolean bool){
+    int nbPionsJoueurEvalue = 0;
+    int nbPionsAdversaire = 0;
+
+    for(int x = 0; x < 4; x++){
+      int z = 3 - x;
+
+      Plateau.Pion pion = plateau.getPion(x, x, z);
+
+      if(pion != null){
+        Joueur joueur = pion.getJoueur();
+
+        if((bool && joueur == this) || (!bool && joueur != this)){
+          nbPionsJoueurEvalue++;
+        } else {
+          nbPionsAdversaire++;
+        }
+      }
+    }
+
+    return attributionPointsV2(nbPionsJoueurEvalue, nbPionsAdversaire);
+  }
+
+  /**
+    * Evalue une des diagonales du plateau par rapport au pion posé
+    * @param plateau le plateau du jeu
+    * @bool true si on évalue l'IA, false si on évalue l'adversaire
+    * @return la valeur de la ligne
+    */
+  public int evaluationDiagonaleDiagonaleXZ(Plateau plateau, boolean bool){
+    int nbPionsJoueurEvalue = 0;
+    int nbPionsAdversaire = 0;
+
+    for(int x = 0; x < 4; x++){
+      int y = 3 - x;
+
+      Plateau.Pion pion = plateau.getPion(x, y, x);
+
+      if(pion != null){
+        Joueur joueur = pion.getJoueur();
+
+        if((bool && joueur == this) || (!bool && joueur != this)){
+          nbPionsJoueurEvalue++;
+        } else {
+          nbPionsAdversaire++;
+        }
+      }
+    }
+
+    return attributionPointsV2(nbPionsJoueurEvalue, nbPionsAdversaire);
+  }
+
+  /**
+    * Evalue une des diagonales du plateau par rapport au pion posé
+    * @param plateau le plateau du jeu
+    * @bool true si on évalue l'IA, false si on évalue l'adversaire
+    * @return la valeur de la ligne
+    */
+  public int evaluationDiagonaleDiagonaleYZ(Plateau plateau, boolean bool){
+    int nbPionsJoueurEvalue = 0;
+    int nbPionsAdversaire = 0;
+
+    for(int y = 0; y < 4; y++){
+      int x = 3 - y;
+
+      Plateau.Pion pion = plateau.getPion(x, y, y);
+
+      if(pion != null){
+        Joueur joueur = pion.getJoueur();
+
+        if((bool && joueur == this) || (!bool && joueur != this)){
+          nbPionsJoueurEvalue++;
+        } else {
+          nbPionsAdversaire++;
+        }
+      }
+    }
+
+    return attributionPointsV2(nbPionsJoueurEvalue, nbPionsAdversaire);
+  }
+
+  /**
+    * Evalue une des diagonales du plateau par rapport au pion posé
+    * @param plateau le plateau du jeu
+    * @bool true si on évalue l'IA, false si on évalue l'adversaire
+    * @return la valeur de la ligne
+    */
+  public int evaluationDiagonaleDiagonaleXYZ(Plateau plateau, boolean bool){
+    int nbPionsJoueurEvalue = 0;
+    int nbPionsAdversaire = 0;
+
+    for(int x = 0; x < 4; x++){
+      Plateau.Pion pion = plateau.getPion(x, x, x);
+
+      if(pion != null){
+        Joueur joueur = pion.getJoueur();
+
+        if((bool && joueur == this) || (!bool && joueur != this)){
+          nbPionsJoueurEvalue++;
+        } else {
+          nbPionsAdversaire++;
+        }
+      }
+    }
+
+    return attributionPointsV2(nbPionsJoueurEvalue, nbPionsAdversaire);
+  }
+}

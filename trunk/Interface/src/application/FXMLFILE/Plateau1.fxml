@@ -1,0 +1,948 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Point3D?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.paint.PhongMaterial?>
+<?import javafx.scene.shape.Box?>
+<?import javafx.scene.shape.Cylinder?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.shape.Sphere?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="1186.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.Sogo">
+   <children>
+      <AnchorPane layoutX="26.0" layoutY="-15.0" prefHeight="550.0" prefWidth="830.0" rotate="-60.0">
+         <children>
+            <Box depth="25.0" height="400.0" layoutX="387.0" layoutY="249.0" translateX="-5.0" translateY="10.0" translateZ="87.5" width="700.0">
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material> 
+            </Box>
+            <Cylinder height="200.0" layoutX="642.0" layoutY="151.0" radius="5.0" rotate="90.0" translateZ="-15.0">
+               <rotationAxis>
+                  <Point3D x="1.0" />
+               </rotationAxis>
+               <material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>
+            </Cylinder>
+            <Sphere fx:id="p300" layoutX="642.0" layoutY="151.0" opacity="0.0" radius="25.0" translateZ="60.0">
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>
+            </Sphere>
+            <Sphere fx:id="p301" layoutX="642.0" layoutY="151.0" opacity="0.0" radius="25.0" translateZ="10.0">
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>
+            </Sphere>
+            <Sphere fx:id="p302" layoutX="642.0" layoutY="151.0" opacity="0.0" radius="25.0" translateZ="-40.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p303" layoutX="642.0" layoutY="151.0" opacity="0.0" radius="25.0" translateZ="-90.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Cylinder height="200.0" layoutX="642.0" layoutY="226.0" radius="5.0" rotate="90.0" translateZ="-15.0">
+               <rotationAxis>
+                  <Point3D x="1.0" />
+               </rotationAxis>
+               <material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>
+            </Cylinder>
+            <Sphere fx:id="p310" layoutX="642.0" layoutY="226.0" opacity="0.0" radius="25.0" translateZ="60.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p311" layoutX="642.0" layoutY="226.0" opacity="0.0" radius="25.0" translateZ="10.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+         </Sphere>
+            <Sphere fx:id="p312" layoutX="642.0" layoutY="226.0" opacity="0.0" radius="25.0" translateZ="-40.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p313" layoutX="642.0" layoutY="226.0" opacity="0.0" radius="25.0" translateZ="-90.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+           </Sphere>
+            <Cylinder disable="true" height="200.0" layoutX="642.0" layoutY="301.0" radius="5.0" rotate="90.0" translateZ="-15.0">
+               <rotationAxis>
+                  <Point3D x="1.0" />
+               </rotationAxis>
+               <material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>
+            </Cylinder>
+            <Sphere fx:id="p320" layoutX="642.0" layoutY="301.0" opacity="0.0" radius="25.0" translateZ="60.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p321" layoutX="642.0" layoutY="301.0" opacity="0.0" radius="25.0" translateZ="10.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+           	</Sphere>
+            <Sphere fx:id="p322" layoutX="642.0" layoutY="301.0" opacity="0.0" radius="25.0" translateZ="-40.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+          	</Sphere>
+            <Sphere fx:id="p323" layoutX="642.0" layoutY="299.0" opacity="0.0" radius="25.0" translateZ="-90.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+          </Sphere>
+            <Cylinder height="200.0" layoutX="642.0" layoutY="376.0" radius="5.0" rotate="90.0" translateZ="-15.0">
+               <rotationAxis>
+                  <Point3D x="1.0" />
+               </rotationAxis>
+               <material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>
+            </Cylinder>
+            <Sphere fx:id="p330" layoutX="642.0" layoutY="376.0" opacity="0.0" radius="25.0" translateZ="60.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p331" layoutX="642.0" layoutY="376.0" opacity="0.0" radius="25.0" translateZ="10.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p332" layoutX="642.0" layoutY="376.0" opacity="0.0" radius="25.0" translateZ="-40.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p333" layoutX="642.0" layoutY="376.0" opacity="0.0" radius="25.0" translateZ="-90.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Cylinder height="200.0" layoutX="467.0" layoutY="151.0" radius="5.0" rotate="90.0" translateZ="-15.0">
+               <rotationAxis>
+                  <Point3D x="1.0" />
+               </rotationAxis>
+               <material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>
+            </Cylinder>
+            <Sphere fx:id="p200" layoutX="467.0" layoutY="151.0" opacity="0.0" radius="25.0" translateZ="60.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p201" layoutX="467.0" layoutY="151.0" opacity="0.0" radius="25.0" translateZ="10.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p202" layoutX="467.0" layoutY="151.0" opacity="0.0" radius="25.0" translateZ="-40.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p203" layoutX="467.0" layoutY="151.0" opacity="0.0" radius="25.0" translateZ="-90.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Cylinder height="200.0" layoutX="467.0" layoutY="226.0" radius="5.0" rotate="90.0" translateZ="-15.0">
+               <rotationAxis>
+                  <Point3D x="1.0" />
+               </rotationAxis>
+               <material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>
+            </Cylinder>
+            <Sphere fx:id="p210" layoutX="467.0" layoutY="226.0" opacity="0.0" radius="25.0" translateZ="60.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p211" layoutX="467.0" layoutY="226.0" opacity="0.0" radius="25.0" translateZ="10.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>           
+             </Sphere>
+            <Sphere fx:id="p212" layoutX="467.0" layoutY="226.0" opacity="0.0" radius="25.0" translateZ="-40.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p213" layoutX="467.0" layoutY="226.0" opacity="0.0" radius="25.0" translateZ="-90.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+           	</Sphere>
+            <Cylinder height="200.0" layoutX="467.0" layoutY="301.0" radius="5.0" rotate="90.0" translateZ="-15.0">
+               <rotationAxis>
+                  <Point3D x="1.0" />
+               </rotationAxis>
+               <material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>
+            </Cylinder>
+            <Sphere fx:id="p220" layoutX="467.0" layoutY="301.0" opacity="0.0" radius="25.0" translateZ="60.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p221" layoutX="467.0" layoutY="301.0" opacity="0.0" radius="25.0" translateZ="10.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p222" layoutX="467.0" layoutY="301.0" opacity="0.0" radius="25.0" translateZ="-40.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p223" layoutX="467.0" layoutY="301.0" opacity="0.0" radius="25.0" translateZ="-90.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Cylinder height="200.0" layoutX="467.0" layoutY="376.0" radius="5.0" rotate="90.0" translateZ="-15.0">
+               <rotationAxis>
+                  <Point3D x="1.0" />
+               </rotationAxis>
+               <material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>
+            </Cylinder>
+            <Sphere fx:id="p230" layoutX="467.0" layoutY="376.0" opacity="0.0" radius="25.0" translateZ="60.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p231" layoutX="467.0" layoutY="376.0" opacity="0.0" radius="25.0" translateZ="10.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p232" layoutX="467.0" layoutY="376.0" opacity="0.0" radius="25.0" translateZ="-40.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p233" layoutX="467.0" layoutY="376.0" opacity="0.0" radius="25.0" translateZ="-90.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+          	</Sphere>
+            <Cylinder height="200.0" layoutX="292.0" layoutY="151.0" radius="5.0" rotate="90.0" translateZ="-15.0">
+               <rotationAxis>
+                  <Point3D x="1.0" />
+               </rotationAxis>
+               <material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>
+            </Cylinder>
+            <Sphere fx:id="p100" layoutX="292.0" layoutY="151.0" opacity="0.0" radius="25.0" translateZ="60.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p101" layoutX="292.0" layoutY="151.0" opacity="0.0" radius="25.0" translateZ="10.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p102" layoutX="292.0" layoutY="151.0" opacity="0.0" radius="25.0" translateZ="-40.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p103" layoutX="292.0" layoutY="151.0" opacity="0.0" radius="25.0" translateZ="-90.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Cylinder height="200.0" layoutX="292.0" layoutY="226.0" radius="5.0" rotate="90.0" translateZ="-15.0">
+               <rotationAxis>
+                  <Point3D x="1.0" />
+               </rotationAxis>
+               <material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>
+            </Cylinder>
+            <Sphere fx:id="p110" layoutX="292.0" layoutY="226.0" opacity="0.0" radius="25.0" translateZ="60.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p111" layoutX="292.0" layoutY="226.0" opacity="0.0" radius="25.0" translateZ="10.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p112" layoutX="292.0" layoutY="226.0" opacity="0.0" radius="25.0" translateZ="-40.0">
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>
+            </Sphere>
+            <Sphere fx:id="p113" layoutX="292.0" layoutY="226.0" opacity="0.0" radius="25.0" translateZ="-90.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Cylinder blendMode="RED" height="200.0" layoutX="292.0" layoutY="301.0" radius="5.0" rotate="90.0" translateZ="-15.0">
+               <rotationAxis>
+                  <Point3D x="1.0" />
+               </rotationAxis>
+               <material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>
+            </Cylinder>
+            <Sphere fx:id="p120" layoutX="292.0" layoutY="301.0" opacity="0.0" radius="25.0" translateZ="60.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p121" layoutX="292.0" layoutY="301.0" opacity="0.0" radius="25.0" translateZ="10.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p122" layoutX="292.0" layoutY="301.0" opacity="0.0" radius="25.0" translateZ="-40.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p123" layoutX="292.0" layoutY="301.0" opacity="0.0" radius="25.0" translateZ="-90.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            </Sphere>
+            <Cylinder height="200.0" layoutX="292.0" layoutY="376.0" radius="5.0" rotate="90.0" translateZ="-15.0">
+               <rotationAxis>
+                  <Point3D x="1.0" />
+               </rotationAxis>
+               <material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>
+            </Cylinder>
+            <Sphere fx:id="p130" layoutX="292.0" layoutY="376.0" opacity="0.0" radius="25.0" translateZ="60.0">
+				<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p131" layoutX="292.0" layoutY="376.0" opacity="0.0" radius="25.0" translateZ="10.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p132" layoutX="292.0" layoutY="376.0" opacity="0.0" radius="25.0" translateZ="-40.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p133" layoutX="292.0" layoutY="376.0" opacity="0.0" radius="25.0" translateZ="-90.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Cylinder height="200.0" layoutX="117.0" layoutY="151.0" radius="5.0" rotate="90.0" translateZ="-15.0">
+               <rotationAxis>
+                  <Point3D x="1.0" />
+               </rotationAxis>
+               <material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>
+            </Cylinder>
+            <Sphere fx:id="p000" cullFace="NONE" layoutX="117.0" layoutY="151.0" opacity="0.0" radius="25.0" translateZ="60.0" AnchorPane.bottomAnchor="374.0" AnchorPane.leftAnchor="92.0" AnchorPane.rightAnchor="688.0" AnchorPane.topAnchor="126.0">
+              <material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material> 
+            </Sphere>
+            <Sphere fx:id="p001" layoutX="117.0" layoutY="151.0" opacity="0.0" radius="25.0" translateZ="10.0">
+               <material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material> 
+            </Sphere>
+            <Sphere fx:id="p002" layoutX="117.0" layoutY="151.0" opacity="0.0" radius="25.0" translateZ="-40.0">
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>
+            </Sphere>
+            
+            <Sphere fx:id="p003" layoutX="117.0" layoutY="151.0" opacity="0.0" radius="25.0" rotate="-0.0" translateZ="-90.0">
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>
+            </Sphere>
+            <Cylinder height="200.0" layoutX="117.0" layoutY="226.0" radius="5.0" rotate="90.0" translateZ="-15.0">
+               <rotationAxis>
+                  <Point3D x="1.0" />
+               </rotationAxis>
+               <material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>
+            </Cylinder>		
+            <Sphere fx:id="p010" layoutX="117.0" layoutY="226.0" opacity="0.0" radius="25.0" translateZ="60.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p011" layoutX="117.0" layoutY="226.0" opacity="0.0" radius="25.0" translateZ="10.0">
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>
+            </Sphere>
+            <Sphere fx:id="p012" layoutX="117.0" layoutY="226.0" opacity="0.0" radius="25.0" translateZ="-40.0">
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>
+            </Sphere>
+            <Sphere fx:id="p013" layoutX="117.0" layoutY="226.0" opacity="0.0" radius="25.0" translateZ="-90.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Cylinder height="200.0" layoutX="117.0" layoutY="301.0" opacity="0.24" radius="5.0" rotate="90.0" translateZ="-15.0">
+               <rotationAxis>
+                  <Point3D x="1.0" />
+               </rotationAxis>
+               <material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>
+            </Cylinder>
+            <Sphere fx:id="p020" layoutX="117.0" layoutY="301.0" opacity="0.0" radius="25.0" translateZ="60.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+           	</Sphere>
+            <Sphere fx:id="p021" layoutX="117.0" layoutY="301.0" opacity="0.0" radius="25.0" translateZ="10.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            	
+            </Sphere>
+            <Sphere fx:id="p022" layoutX="117.0" layoutY="301.0" opacity="0.0" radius="25.0" translateZ="-40.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p023" layoutX="117.0" layoutY="301.0" opacity="0.0" radius="25.0" translateZ="-90.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Cylinder height="200.0" layoutX="117.0" layoutY="376.0" radius="5.0" rotate="90.0" translateZ="-15.0">
+               <rotationAxis>
+                  <Point3D x="1.0" />
+               </rotationAxis>
+               <material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>
+            </Cylinder>
+            <Sphere fx:id="p030" layoutX="117.0" layoutY="376.0" opacity="0.0" radius="25.0" translateZ="60.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p031" layoutX="117.0" layoutY="376.0" opacity="0.0" radius="25.0" translateZ="10.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p032" layoutX="117.0" layoutY="376.0" opacity="0.0" radius="25.0" translateZ="-40.0">
+
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>            
+            </Sphere>
+            <Sphere fx:id="p033" layoutX="117.0" layoutY="376.0" opacity="0.0" radius="25.0" translateZ="-90.0">
+            	<material>
+            		<PhongMaterial diffuseColor="0xffffffff">
+            			<diffuseMap>
+            				<Image url="/application/Pictures/im.png" />
+            			</diffuseMap>
+            		</PhongMaterial>
+            	</material>
+            </Sphere>
+            <ImageView fx:id="plateauIA1" fitHeight="46.0" fitWidth="118.0" layoutX="217.0" layoutY="475.0" pickOnBounds="true" visible="false" x="6.0">
+               <image>
+                  <Image url="@../Pictures/IA1.png" />
+               </image>
+            </ImageView>
+            <ImageView fx:id="plateauIA2" fitHeight="46.0" fitWidth="118.0" layoutX="217.0" layoutY="475.0" pickOnBounds="true" visible="false" x="150.0">
+               <image>
+                  <Image url="@../Pictures/IA2.png" />
+               </image>
+            </ImageView>
+         </children>
+         <rotationAxis>
+            <Point3D x="90.0" y="30.0" z="67.0" />
+         </rotationAxis>
+      </AnchorPane>
+      <AnchorPane layoutX="-6.0" prefHeight="625.0" prefWidth="1199.0">
+         <children>
+            <Separator layoutX="853.0" orientation="VERTICAL" prefHeight="625.0" prefWidth="32.0" />
+            <Region fx:id="a1" layoutX="127.0" layoutY="224.0" onMouseClicked="#jouerPartie" prefHeight="158.0" prefWidth="14.0" />
+            <Region fx:id="a2" layoutX="172.0" layoutY="267.0" onMouseClicked="#jouerPartie" prefHeight="151.0" prefWidth="14.0" />
+            <Region fx:id="a3" layoutX="218.0" layoutY="307.0" onMouseClicked="#jouerPartie" prefHeight="151.0" prefWidth="14.0" />
+            <Region fx:id="a4" layoutX="261.0" layoutY="347.0" onMouseClicked="#jouerPartie" prefHeight="151.0" prefWidth="14.0" />
+            <Region fx:id="b1" layoutX="266.0" layoutY="152.0" onMouseClicked="#jouerPartie" prefHeight="158.0" prefWidth="14.0" />
+            <Region fx:id="b2" layoutX="312.0" layoutY="196.0" onMouseClicked="#jouerPartie" prefHeight="151.0" prefWidth="14.0" />
+            <Region fx:id="b3" layoutX="357.0" layoutY="233.0" onMouseClicked="#jouerPartie" prefHeight="151.0" prefWidth="14.0" />
+            <Region fx:id="b4" layoutX="401.0" layoutY="277.0" onMouseClicked="#jouerPartie" prefHeight="151.0" prefWidth="14.0" />
+            <Region fx:id="c1" layoutX="407.0" layoutY="78.0" onMouseClicked="#jouerPartie" prefHeight="158.0" prefWidth="14.0" />
+            <Region fx:id="c2" layoutX="453.0" layoutY="119.0" onMouseClicked="#jouerPartie" prefHeight="158.0" prefWidth="14.0" />
+            <Region fx:id="c3" layoutX="497.0" layoutY="160.0" onMouseClicked="#jouerPartie" prefHeight="158.0" prefWidth="14.0" />
+            <Region fx:id="c4" layoutX="542.0" layoutY="195.0" onMouseClicked="#jouerPartie" prefHeight="158.0" prefWidth="14.0" />
+            <Region fx:id="d1" layoutX="548.0" layoutY="4.0" onMouseClicked="#jouerPartie" prefHeight="158.0" prefWidth="14.0" />
+            <Region fx:id="d2" layoutX="592.0" layoutY="45.0" onMouseClicked="#jouerPartie" prefHeight="158.0" prefWidth="14.0" />
+            <Region fx:id="d3" layoutX="638.0" layoutY="84.0" onMouseClicked="#jouerPartie" prefHeight="165.0" prefWidth="14.0" />
+            <Region fx:id="d4" layoutX="682.0" layoutY="124.0" onMouseClicked="#jouerPartie" prefHeight="165.0" prefWidth="14.0" />
+            <Label layoutX="861.0" layoutY="12.0" prefHeight="75.0" prefWidth="298.0" text="     SOGO" textFill="#e82f2f">
+               <font>
+                  <Font name="System Bold Italic" size="60.0" />
+               </font>
+            </Label>
+            <Label layoutX="933.0" layoutY="165.0" prefHeight="27.0" prefWidth="193.0" text="        SCORE" textFill="#eeeaea">
+               <font>
+                  <Font name="System Italic" size="26.0" />
+               </font>
+            </Label>
+            <Label layoutX="861.0" layoutY="88.0" prefHeight="31.0" prefWidth="298.0" text="        PLAYER1 VS PLAYER2" textFill="#eeeaea">
+               <font>
+                  <Font name="System Italic" size="22.0" />
+               </font>
+            </Label>
+            <Label fx:id="player2Score" layoutX="1064.0" layoutY="201.0" prefHeight="39.0" prefWidth="45.0" text="0" textFill="#eeeaea" wrapText="true">
+               <font>
+                  <Font name="System Italic" size="26.0" />
+               </font>
+            </Label>
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#1f93ff05" height="39.0" layoutX="917.0" layoutY="202.0" stroke="#fffdfd" strokeType="INSIDE" width="237.0" />
+            <TextArea fx:id="communication" editable="false" layoutX="913.0" layoutY="268.0" prefHeight="210.0" prefWidth="237.0" />
+            <Button layoutX="894.0" layoutY="574.0" mnemonicParsing="false" onMouseClicked="#exit" text="Quitter" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#1f93ff0d" height="31.0" layoutX="914.0" layoutY="123.0" stroke="#c6bdbd" strokeType="INSIDE" width="237.0" />
+            <Separator layoutX="1029.0" layoutY="123.0" orientation="VERTICAL" prefHeight="31.0" prefWidth="6.0" />
+            <Label fx:id="player1Name" layoutX="955.0" layoutY="125.0" prefHeight="27.0" prefWidth="70.0" text="Label" />
+            <Label fx:id="player2Name" layoutX="1066.0" layoutY="124.0" prefHeight="27.0" prefWidth="83.0" text="Label" />
+            <Label layoutX="1016.0" layoutY="205.0" prefHeight="31.0" prefWidth="45.0" text="  -" textFill="#eeeaea" wrapText="true">
+               <font>
+                  <Font name="System Italic" size="26.0" />
+               </font>
+            </Label>
+            <Label fx:id="player1Score" layoutX="988.0" layoutY="202.0" prefHeight="39.0" prefWidth="32.0" text="0" textFill="#eeeaea" wrapText="true">
+               <font>
+                  <Font name="System Italic" size="26.0" />
+               </font>
+            </Label>
+            <Region fx:id="plaTeauIA1" layoutX="395.0" layoutY="413.0" onMouseClicked="#jouerPartie" prefHeight="39.0" prefWidth="153.0" rotate="-60.9" visible="false">
+               <rotationAxis>
+                  <Point3D x="1.0" y="1.0" z="1.0" />
+               </rotationAxis>
+            </Region>
+            <Region fx:id="plaTeauIA2" layoutX="517.0" layoutY="354.0" onMouseClicked="#jouerPartie" prefHeight="39.0" prefWidth="146.0" rotate="-59.5" visible="false">
+               <rotationAxis>
+                  <Point3D x="1.0" y="1.0" z="1.0" />
+               </rotationAxis>
+            </Region>
+            <Button fx:id="archiver" layoutX="975.0" layoutY="574.0" mnemonicParsing="false" onMouseClicked="#chargeArchive" text="Archiver" visible="false" />
+            <Button fx:id="Continue1" layoutX="1061.0" layoutY="574.0" mnemonicParsing="false" onAction="#replayStart" text="Continue" visible="false" />
+            <ImageView fx:id="lectureInterface" fitHeight="56.0" fitWidth="150.0" layoutX="425.0" layoutY="546.0" pickOnBounds="true" preserveRatio="true" visible="false">
+               <image>
+                  <Image url="@../Pictures/lire.png" />
+               </image>
+            </ImageView>
+            <Region fx:id="lectureInterfaceG" layoutX="423.0" layoutY="543.0" onMouseClicked="#jouerPartie" prefHeight="62.0" prefWidth="61.0" visible="false" />
+         </children>
+      </AnchorPane>
+   </children>
+   <rotationAxis>
+      <Point3D y="1.0" />
+   </rotationAxis>
+</AnchorPane>

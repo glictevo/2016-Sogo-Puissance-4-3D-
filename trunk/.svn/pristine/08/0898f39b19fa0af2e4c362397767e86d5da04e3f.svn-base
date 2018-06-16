@@ -1,0 +1,25 @@
+Sogo : Tournant
+TypeJoueur : Humain
+Joueur1nom : Lola
+TypeJoueur : Humain
+Joueur2nom : Paul
+Lola : 0,0
+Lola nbQuartDeTour : 0
+Paul : 1,1
+Paul nbQuartDeTour : 1
+Lola : 0,1
+Lola nbQuartDeTour : 0
+Paul : 1,1
+Paul nbQuartDeTour : 1
+Lola : 0,2
+Lola nbQuartDeTour : 0
+Paul : 0,3
+Paul nbQuartDeTour : 0
+Lola : 1,2
+Lola nbQuartDeTour : 0
+Paul : 1,1
+Paul nbQuartDeTour : 1
+Lola : 2,0
+Lola nbQuartDeTour : 0
+Paul : 3,0
+Paul nbQuartDeTour : 0

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="ancienne_version_terminal">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/doc/ancienne_version_terminal.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

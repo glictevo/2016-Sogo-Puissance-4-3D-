@@ -1,0 +1,388 @@
+package application;
+
+import java.io.Serializable;
+
+import javafx.scene.Node;
+import javafx.scene.layout.Region;
+import javafx.stage.Stage;
+
+
+/**
+  * Cette classe gère le plateau du jeu
+  * Elle contient des fonctions permettant de :
+  * - placer/retirer un pion d'un pilier
+  * - de renvoyer le plateau sous forme d'un tableau tridimensionnel
+  * - de savoir si un joueur à gagné
+  */
+public class Plateau implements Serializable{
+
+  /**
+    * Les attributs décrivant un objets de type plateau sont un tableau
+    * tridimensionnel et deux booléen de victoire, un pour cahque joueur,
+    * permettant de savoir lequel est en état de victoire ou non
+    */
+  protected Pion[][][] plateau;
+  private boolean victoireJ1;
+  private boolean victoireJ2;
+
+  /**
+    * Constructeur d'un plateau.
+    * Construit le plateau avec les tailles données en argument
+    * @param x le nombre de piliers voulus dans la largeur du plateau
+    * @param y le nombre de piliers ovulus dans la longueur du plateau
+    * @param z le nombre de pions qu'on peut placer sur chaque pilier du plateau (hauteur)
+    */
+  public Plateau(int x, int y , int z){
+    this.plateau = new Pion[x][y][z];
+    this.victoireJ1 = false;
+    this.victoireJ2 = false;
+  }
+
+  /**
+    * Renvoie le plateau de jeu
+    * @return le plateau de jeu (un tableau tridimensionnel de Pion)
+    */
+  public Pion[][][] getPlateau(){
+    return this.plateau;
+  }
+
+  /**
+    * Renvoie la valeur de la variable disant si le joueur a gagné sur cette partie
+    * @param numJoueur le numéro du joueur dont on souhaite savoir s'il a gagné
+    * @return true si le joueur a gagné, false sinon
+    */
+  public boolean getVictoire(int numJoueur){
+    if(numJoueur == 1){
+      return this.victoireJ1;
+    } else if (numJoueur == 2){
+      return this.victoireJ2;
+    }
+
+    return false;
+  }
+
+  /**
+    * Renvoie le pion aux coordonnées passées en argument, ou null
+    * @param x la coordonnée x
+    * @param y la coordonnée y
+    * @param z la coordonnée z
+    * @return le Pion à la position passée en argument, ou null s'il n'y en a pas à cette position
+    */
+  public Pion getPion(int x, int y ,int z){
+    if(x >= 0 && y >= 0 && z >= 0 && x < plateau.length && y < plateau[0].length && z < plateau[0][0].length){
+      return plateau[x][y][z];
+    }
+
+    return null;
+  }
+
+  /**
+    * Place un Pion aux coordonnées passées en argument
+    * Il créé un Pion appartenant au joueur passé en argument
+    * Le pion est placé si la place est vide
+    * @param x la coordonnée x
+    * @param y la coordonnée y
+    * @param z la coordonnée z
+    * @param joueur le joueur auquel le Pion appartiendra
+    * @return true si le Pion a été placé, false sinon
+    */
+  public boolean setPion(int x, int y, int z, Joueur joueur){
+    if(this.getPion(x, y, z) == null){
+      plateau[x][y][z] = new Pion(joueur);
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+    * Retire le Pion du haut du pilier passé en argument
+    * @param x la coordonnée x du pilier
+    * @param y la coordonnée y du pilier
+    */
+  public void retirerPion(int x, int y){
+    for(int z = 3; z >= 0; z--){
+      if(this.getPion(x, y, z) != null){
+        plateau[x][y][z] = null;
+        break;
+      }
+    }
+  }
+
+  /**
+    * Place le pion sur le plateau
+    * @param coordonnees les coordonnees du pilier où on veut ajouter un pion
+    * @param joueur le joueur qui ajoute son pion
+    * @exception ExceptionPilierRempli Soulève une exception si on ne peut pas paser le pion
+    */
+  public void placer(Coordonnees coordonnees, Joueur joueur,String modeCalcul) throws ExceptionPilierRempli{
+
+    int x = coordonnees.getX();
+    int y = coordonnees.getY();
+
+    boolean placement = false;
+    ScannerInput partieTerminal = new ScannerInput();
+
+    for(int z = 0; z < plateau.length; z++){
+      if(this.setPion(x, y, z, joueur) == true){
+        if(partieTerminal.getTypeDePartie().equals("Interface") && modeCalcul.equals("NONCALCUL")){
+          Listener msj = new Listener();
+          msj.turnPion("p"+x+""+y+""+z,joueur.getId());
+          placement = true;
+          return;
+        }
+        placement = true;
+        break;
+      }
+    }
+
+    if(!placement){
+      if(partieTerminal.getTypeDePartie().equals("Interface") && modeCalcul.equals("NONCALCUL")){
+        Stage stage = (new Listener()).getStage();
+        Node n = stage.getScene().lookup("#"+((char)(97+coordonnees.getX()))+(coordonnees.getY()+1) );
+        ((Region)n).setDisable(true);
+        return;
+      }
+      throw new ExceptionPilierRempli(coordonnees);
+    }
+
+  }
+  public void retabliPlateau(){
+    for(int x = 0; x < this.plateau.length; x++){
+      for(int y = 0; y < this.plateau.length; y++){
+        for(int z = 0; z < this.plateau.length; z++){
+          Listener msj = new Listener();
+          if(this.plateau[x][y][z] != null){
+            msj.turnPion("p"+x+""+y+""+z,this.plateau[x][y][z].getJoueur().getId());
+          }else if(this instanceof PlateauTournant){
+            msj.turnPion("p"+x+""+y+""+z,3);
+          }
+        }
+      }
+
+    }
+  }
+
+  /**
+    * La fonction vérifie toutes les possibilités, toutes les lignes et
+    * regarde si un des joueurs est gagnant
+    * Cette fonction permet notamment d'avoir les deux joueur gagnant en même temps
+    * (comme c'est possible avec la version tournante du Sogo)
+    * @return si l'un ou les deux ou aucun des joueurs gagnent la partie
+    */
+  public boolean verifierVictoire(){
+    //Variable a initialiser dans le sogo, presente que dans les test de gain
+    boolean gainJ1 = false, gainJ2 = false;
+
+    // Deux variables necessaire pour les 13 direction possibles
+    //Initialisation d'un compteur de nombre de pion sur la ligne
+  int pionHorizontalesY = 0, pionHorizontalesX = 0, pionVerticalZ = 0, pionHorizontalesMontanteY = 0;
+  int pionHorizontalesMontanteX = 0, pionHorizontalesDescendanteY = 0, pionHorizontalesDescendanteX = 0;
+  int pionDiagonalXPlus = 0, pionDiagonalXMoins = 0, pionDiagonalXPlusMontante = 0;
+  int pionDiagonalXMoinsMontante = 0, pionDiagonalXPlusDescendante = 0, pionDiagonalXMoinsDescendante = 0;
+
+    //  Stockage de l'id du joueur sur la ligne en cours, initialise a -1 pour différentier des reel id
+  int joueurHorizontaleY = -1, joueurHorizontaleX = -1, joueurVerticalZ = -1, joueurHorizontalesMontanteY = -1;
+  int joueurHorizontalesMontanteX = -1, joueurHorizontalesDescendanteY = -1, joueurHorizontalesDescendanteX = -1;
+  int joueurDiagonalXPlus = -1, joueurDiagonalXMoins = -1, joueurDiagonalXPlusMontante = -1;
+  int joueurDiagonalXMoinsMontante = -1, joueurDiagonalXPlusDescendante = -1, joueurDiagonalXMoinsDescendante = -1;
+
+    //Vérifie toute les lignes horizontales a Y, celles horizontales a X et les Verticales en Z
+    for(int i=0; i<4; i++){
+      for(int j=0; j<4; j++){
+
+        //On remet les compteurs a 0, apres chaque ligne
+        pionHorizontalesY = 0; pionHorizontalesX = 0; pionVerticalZ = 0;
+        joueurHorizontaleY = -1; joueurHorizontaleX = -1; joueurVerticalZ = -1;
+
+        for(int k=0; k<4; k++){
+
+          // Pour les lignes horizontales a Y ( vers le bas x = j, y = k, z = i)
+          //Si la case n'est pas vide
+          // Et Si cest un nouveau joueur ou correspond au joueur du coup précèdent
+          if(getPion(i, k, j) != null && (joueurHorizontaleY == getPion(i, k, j).getJoueur().getId() || joueurHorizontaleY == -1)){
+            joueurHorizontaleY = getPion(i, k, j).getJoueur().getId();
+            pionHorizontalesY += 1;
+          }
+            // Idem pour les lignes horizontales a X ( vers la droite x = k, y = j, z = i)
+          if (getPion(k, i, j) != null && (joueurHorizontaleX == getPion(k, i, j).getJoueur().getId() || joueurHorizontaleX == -1)){
+              joueurHorizontaleX = getPion(k, i, j).getJoueur().getId();
+              pionHorizontalesX += 1;
+            }
+            // Idem pour les lignes verticales en Z ( vers le haut x = i, y = j, z = k)
+          if (getPion(i, j, k) != null && (joueurVerticalZ == getPion(i, j, k).getJoueur().getId() || joueurVerticalZ == -1)){
+              joueurVerticalZ = getPion(i, j, k).getJoueur().getId();
+              pionVerticalZ += 1;
+            }
+        }
+
+        //Test les gains des lignes des 3 directions possibles
+        if(pionHorizontalesY == 4){
+          if(joueurHorizontaleY == 0){ gainJ1 = true; }
+          else { gainJ2 = true; }
+        }
+        if(pionHorizontalesX == 4){
+          if(joueurHorizontaleX == 0){ gainJ1 = true; }
+          else { gainJ2 = true; }
+        }
+        if(pionVerticalZ == 4){
+          if(joueurVerticalZ == 0){ gainJ1 = true; }
+          else { gainJ2 = true; }
+        }
+      }
+    }
+
+    //On va vérifier les lignes Horizontales mais cette fois ci les montantes et descendante
+    // Ainsi que les deux diagonales pour un Z fixe
+    for (int i=0; i < 4; i++) {
+      //On remet les compteurs a 0, apres chaque ligne
+    pionHorizontalesMontanteY = 0; pionHorizontalesMontanteX = 0; pionHorizontalesDescendanteY = 0;
+    pionHorizontalesDescendanteX = 0; pionDiagonalXPlus = 0; pionDiagonalXMoins = 0;
+
+    joueurHorizontalesMontanteY = -1; joueurHorizontalesMontanteX = -1; joueurHorizontalesDescendanteY = -1;
+    joueurHorizontalesDescendanteX = -1; joueurDiagonalXPlus = -1; joueurDiagonalXMoins = -1;
+
+      for (int j=0; j < 4; j++) {
+
+        // Pour les lignes horizontales a Y montante( vers le bas x = i, y = z = j)
+        //Si la case n'est pas vide
+        // Et Si cest un nouveau joueur ou correspond au joueur du coup précèdent
+        if(getPion(i,j,j) != null && (joueurHorizontalesMontanteY == getPion(i,j,j).getJoueur().getId() || joueurHorizontalesMontanteY == -1)){
+          joueurHorizontalesMontanteY = getPion(i,j,j).getJoueur().getId();
+          pionHorizontalesMontanteY += 1;
+        }
+        // Idem pour les lignes horizontales a X montante ( vers la droite x = z = j, y = i)
+        if(getPion(j,i,j) != null && (joueurHorizontalesMontanteX == getPion(j,i,j).getJoueur().getId() || joueurHorizontalesMontanteX == -1)){
+          joueurHorizontalesMontanteX = getPion(j,i,j).getJoueur().getId();
+          pionHorizontalesMontanteX += 1;
+        }
+        // Idem pour les lignes horizontales a Y descendante ( vers le bas x = i, y = j, z = j - 3)
+        if(getPion(i,j,3-j) != null && (joueurHorizontalesDescendanteY == getPion(i,j,3-j).getJoueur().getId() || joueurHorizontalesDescendanteY == -1)){
+          joueurHorizontalesDescendanteY = getPion(i,j,3-j).getJoueur().getId();
+          pionHorizontalesDescendanteY += 1;
+        }
+        // Idem pour les lignes horizontales a X descendante ( vers la droite x = j, y = i, z = i -3)
+        if(getPion(j,i,3-j) != null && (joueurHorizontalesDescendanteX == getPion(j,i,3-j).getJoueur().getId() || joueurHorizontalesDescendanteX == -1)){
+          joueurHorizontalesDescendanteX = getPion(j,i,3-j).getJoueur().getId();
+          pionHorizontalesDescendanteX += 1;
+        }
+      // Idem pour les lignes diagonale X Plus (x = j, y = j, z = i)
+        if(getPion(j,j,i) != null && (joueurDiagonalXPlus == getPion(j,j,i).getJoueur().getId() || joueurDiagonalXPlus == -1)){
+          joueurDiagonalXPlus = getPion(j,j,i).getJoueur().getId();
+          pionDiagonalXPlus += 1;
+        }
+      // Idem pour les lignes diagonale X Moins( x = 3-j, y = j, z = i)
+        if(getPion(3-j,j,i) != null && (joueurDiagonalXMoins == getPion(3-j,j,i).getJoueur().getId() || joueurDiagonalXMoins == -1)){
+          joueurDiagonalXMoins = getPion(3-j,j,i).getJoueur().getId();
+          pionDiagonalXMoins += 1;
+        }
+      }
+
+      //Test les gains des lignes des 6 directions possibles
+    if(pionHorizontalesMontanteY == 4){
+      if(joueurHorizontalesMontanteY == 0){ gainJ1 = true; }
+      else { gainJ2 = true; }
+    }
+    if(pionHorizontalesMontanteX == 4){
+      if(joueurHorizontalesMontanteX == 0){ gainJ1 = true; }
+      else { gainJ2 = true; }
+    }
+    if(pionHorizontalesDescendanteY == 4){
+      if(joueurHorizontalesDescendanteY == 0){ gainJ1 = true; }
+      else { gainJ2 = true; }
+    }
+    if(pionHorizontalesDescendanteX == 4){
+      if(joueurHorizontalesDescendanteX == 0){ gainJ1 = true; }
+      else { gainJ2 = true; }
+    }
+    if(pionDiagonalXPlus == 4){
+      if(joueurDiagonalXPlus == 0){ gainJ1 = true; }
+      else { gainJ2 = true; }
+    }
+    if(pionDiagonalXMoins == 4){
+      if(joueurDiagonalXMoins== 0){ gainJ1 = true; }
+      else { gainJ2 = true; }
+    }
+    }
+
+    //On va vérifier les deux diagonale mais cette fois ci les montantes et descendante
+    for (int i=0; i < 4; i++) {
+
+      // Pour la DiagonalXPlusMontante(x = y = z = i)
+      //Si la case n'est pas vide
+      // Et Si cest un nouveau joueur ou correspond au joueur du coup précèdent
+      if(getPion(i,i,i) != null && (joueurDiagonalXPlusMontante == getPion(i,i,i).getJoueur().getId() || joueurDiagonalXPlusMontante == -1)){
+        joueurDiagonalXPlusMontante = getPion(i,i,i).getJoueur().getId();
+        pionDiagonalXPlusMontante += 1;
+      }
+    // Idem pour les  DiagonalXMoinsMontante(x = 3-y, y = z = i)
+    if(getPion(3-i,i,i) != null && (joueurDiagonalXMoinsMontante == getPion(3-i,i,i).getJoueur().getId() || joueurDiagonalXMoinsMontante == -1)){
+        joueurDiagonalXMoinsMontante = getPion(3-i,i,i).getJoueur().getId();
+        pionDiagonalXMoinsMontante += 1;
+      }
+    // Idem pour les  DiagonalXPlusDescendante(x = i, y = i, z = 3-i)
+      if(getPion(i,i,3-i) != null && (joueurDiagonalXPlusDescendante == getPion(i,i,3-i).getJoueur().getId() || joueurDiagonalXPlusDescendante == -1)){
+        joueurDiagonalXPlusDescendante = getPion(i,i,3-i).getJoueur().getId();
+        pionDiagonalXPlusDescendante += 1;
+      }
+    // Idem pour les  DiagonalXMoinsDescendante(x = z = 3-i, y = i)
+      if(getPion(3-i,i,3-i) != null && (joueurDiagonalXMoinsDescendante == getPion(3-i,i,3-i).getJoueur().getId() || joueurDiagonalXMoinsDescendante == -1)){
+        joueurDiagonalXMoinsDescendante = getPion(3-i,i,3-i).getJoueur().getId();
+        pionDiagonalXMoinsDescendante += 1;
+      }
+    }
+
+    // Fin du for: Test les gains des lignes des 4 directions possibles
+  if(pionDiagonalXPlusMontante == 4){
+    if(joueurDiagonalXPlusMontante == 0){ gainJ1 = true; }
+    else { gainJ2 = true; }
+  }
+  if(pionDiagonalXMoinsMontante == 4){
+    if(joueurDiagonalXMoinsMontante == 0){ gainJ1 = true; }
+    else { gainJ2 = true; }
+  }
+  if(pionDiagonalXPlusDescendante == 4){
+    if(joueurDiagonalXPlusDescendante == 0){ gainJ1 = true; }
+    else { gainJ2 = true; }
+  }
+  if(pionDiagonalXMoinsDescendante == 4){
+    if(joueurDiagonalXMoinsDescendante == 0){ gainJ1 = true; }
+    else { gainJ2 = true; }
+  }
+
+  victoireJ1 = gainJ1;
+  victoireJ2 = gainJ2;
+
+  return gainJ1 || gainJ2;
+
+  }//Fin vérifBIS
+
+  /**
+    * Cette classe permet de gérer les pions qui sont placés sur le plateau
+    * Elle contient une fonction permettant de savoir à qui un pion appartient
+    */
+  public class Pion implements Serializable{
+
+    /**
+      * L'unique attribut de cette classe est le @link Joueur auquel appartient
+      * le pion
+      */
+    private Joueur joueur;
+
+    /**
+      * Constructeur d'un objet Pion
+      * @param joueur le joueur auquel appartient le pion
+      */
+    public Pion(Joueur joueur){
+      this.joueur = joueur;
+    }
+
+    /**
+      * Renvoie le joueur auquel appartient ce Pion
+      * @return le joueur auquel appartient ce Pion
+      */
+    public Joueur getJoueur(){
+      return this.joueur;
+    }
+  }
+}

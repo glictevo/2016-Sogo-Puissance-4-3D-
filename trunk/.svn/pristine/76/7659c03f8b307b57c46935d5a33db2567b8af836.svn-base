@@ -1,0 +1,995 @@
+package application;
+
+
+import java.io.Serializable;
+import java.net.URL;
+import java.util.ResourceBundle;
+
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.PhongMaterial;
+import javafx.scene.shape.Sphere;
+import javafx.stage.Stage;
+import javafx.util.Duration;
+
+/**
+ * Cette classe prend le relais de l'interface graphique à partir
+ * du menu de choix des joueurs. Elle à le même rôle que dans la
+ * version terminal : gérer le déroulement du jeu.
+ */
+public class Sogo implements Serializable,Initializable{
+
+	/**
+	 *
+	 */
+
+	private static final long serialVersionUID = 1L;
+	protected Plateau plateau;
+	protected static Joueur joueur1;
+	protected static Joueur joueur2;
+	protected static Joueur joueurActuel;
+	protected Affichage affichage;
+	protected Input input;
+	protected int nombreDePions = 64;
+	private static int nbPartiesGagneesJoueur1 = 0;
+	private static int nbPartiesGagneesJoueur2 = 0;
+
+	protected static boolean joueurGagnant = false;
+
+
+	protected ScannerInput partieTerminal = new ScannerInput();
+	protected Listener partieInterface = new Listener();
+	private static int update = 0;
+
+
+	private Sogo sogo = partieInterface.getSogo();
+	private String typeSogoEnCours = ((sogo instanceof SogoTournant)?"Tournant":"Simple");
+	private static int chargePlateauInterface = 0;
+
+	//Attributs interface
+	@FXML
+	private ComboBox<String> combobox1;
+	@FXML
+	private ComboBox<String> combobox2;
+	@FXML
+	private ComboBox<String> combobox3;
+	@FXML
+	private ComboBox<String> combobox4;
+
+	//BOUTTONS CHOIX
+	@FXML
+	private Button playerHumain1;
+	@FXML
+	private Button playerHumain2;
+	@FXML
+	private Button playerIA1;
+	@FXML
+	private Button playerIA2;
+	//BOUTTONS VALIDATION
+	@FXML
+	private Button validationH1;
+	@FXML
+	private Button validationH2;
+	@FXML
+	private Button validationIA1;
+	@FXML
+	private Button validationIA2;
+	//Recommencer
+	@FXML
+	private Button recommencer1;
+	@FXML
+	private Button recommencer2;
+	//ZONE SAISIT
+	@FXML
+	private TextField zoneDeSaisie1;
+	@FXML
+	private TextField zoneDeSaisie2;
+
+	@FXML
+	private TextArea communication;
+	@FXML
+	private Button archiver;
+	@FXML
+	private Button archiveOUI;
+	@FXML
+	private Button archiveNON;
+	@FXML
+	private Button validerArchive;
+	@FXML
+	private Label archiveMessage;
+	@FXML
+	private TextField zonesaisieArchive;
+
+	@FXML
+	private Label player1Name;
+	@FXML
+	private Label player2Name;
+	@FXML
+	private Label player1Score;
+	@FXML
+	private Label player2Score;
+
+
+	@FXML
+	private ImageView plateauIA1;
+	@FXML
+	private Region plaTeauIA1;
+	@FXML
+	private ImageView plateauIA2;
+	@FXML
+	private Region plaTeauIA2;
+
+	@FXML
+	private Button Continue1;
+
+	@FXML
+	private Button nbQuartDeOui;
+	@FXML
+	private Button nbQuartDeNon;
+
+	@FXML
+	private ImageView lectureInterface;
+	@FXML
+	private Region lectureInterfaceG;
+
+
+	/**
+	 * Initialise le sogo
+	 * @param affichage
+	 * @param input
+	 */
+	public void setSogo(Affichage affichage, Input input){
+		this.joueur1 = null;
+		this.joueur2 = null;
+		this.joueurActuel = null;
+		this.affichage = affichage;
+		this.plateau = new Plateau(4, 4, 4);
+		this.input = input;
+	}
+
+	/**
+	 * Initialize le sogo tournant
+	 * @param affichage
+	 * @param input
+	 * @param plateau
+	 */
+	public void setSogoTournant(Affichage affichage, Input input, PlateauTournant plateau){
+		this.affichage = affichage;
+		this.input = input;
+		this.plateau = plateau;
+	}
+
+	/**
+	 * Sauvegarde les données de la partie dans sa situation actuelle.
+	 * @param plateau
+	 * @param joueur1
+	 * @param joueur2
+	 * @param joueurActuel
+	 * @param affichage
+	 * @param input
+	 * @param nombreDePions
+	 * @param nbPartiesGagneesJoueur1
+	 * @param nbPartiesGagneesJoueur2
+	 */
+	public void setSauveOBJ(Plateau plateau, Joueur joueur1, Joueur joueur2, Joueur joueurActuel
+			,Affichage affichage,Input input,int nombreDePions, int nbPartiesGagneesJoueur1, int nbPartiesGagneesJoueur2){
+		this.plateau = plateau;
+		this.joueur1 = joueur1;
+		this.joueur2 = joueur2;
+		this.joueurActuel = joueurActuel;
+		this.affichage = affichage;
+		this.input = input;
+		this.nombreDePions = nombreDePions;
+		this. nbPartiesGagneesJoueur1 =  nbPartiesGagneesJoueur1;
+		this.nbPartiesGagneesJoueur2 = nbPartiesGagneesJoueur2;
+	}
+
+	/**
+	 *Getters/Setters
+	 */
+	public Plateau getPlateau(){
+		return plateau;
+	}
+
+	/**
+	 * On active les champs nécéssaires selon le choix de l'utilisateur.
+	 * @param event
+	 */
+	public void activeZone(MouseEvent event){
+		partieInterface.active(event);
+	}
+
+	/**
+	 * Joue la partie en entière
+	 * @param event
+	 */
+	public void deroulement(ActionEvent event){
+		joueurActuel = ((this.joueurActuel==null)?joueur2:changerJoueurActuel(this.joueurActuel));
+		if(partieTerminal.getTypeDePartie().equals("Terminal")){
+			initialiserJoueurs((partieTerminal.getTypeDePartie().equals("Terminal"))?null:event);
+		}else{
+			initialiserJoueurs((partieTerminal.getTypeDePartie().equals("Terminal"))?null:event);
+			if(joueur1 == null || joueur2 == null){
+				return ;
+			}
+			sogo.joueur1 = joueur1;
+			sogo.joueur2 = joueur2;
+		}
+		joueurActuel = changerJoueurActuel(joueurActuel);
+		sogo.joueurActuel = joueurActuel;
+		jouerNouvellePartie(event);
+		return;
+	}
+	/**
+	 * Initialise les joueurs de la partie
+	 * @param  event
+	 */
+	public void initialiserJoueurs(ActionEvent event){
+		String choice = "";
+
+		try{
+			choice = ((Button) event.getSource()).getId();
+		}catch(NullPointerException e){
+			System.out.println("Partie en cours : Terminal donc event est à null ou lecture en Interface");
+		}
+		boolean versionTerminal = partieTerminal.getTypeDePartie().equals("Terminal");
+		boolean partieInterfaceRead = partieInterface.getModeJeux().equals("lecture");
+		if(choice.equals("validationH1")||choice.equals("validationIA1")||choice.equals("Continue")||versionTerminal||partieInterfaceRead){
+			joueur1 = ((this.joueur1 == null)? ((event!=null||partieInterfaceRead)?partieInterface.buildPlayerInter(event):partieTerminal.buildPlayer(null)):this.joueur1);
+			if(!versionTerminal&&!partieInterfaceRead){return;}
+		}
+		if(choice.equals("validationH2")||choice.equals("validationIA2")||versionTerminal||partieInterfaceRead){
+			joueur2 = ((this.joueur2 == null)? ((event!=null||partieInterfaceRead)?partieInterface.buildPlayerInter(event):partieTerminal.buildPlayer(null)):this.joueur2);
+			return;
+		}
+	}
+	/**
+	 * Permet de jouer plusieurs partie de Sogo si les joueurs le souhaitent
+	 */
+	public void jouerNouvellePartie(ActionEvent event){
+		boolean nouvellePartie = true;
+
+		//On lance la boucle du jeu
+		while(nouvellePartie){
+			boolean quitter = false;
+			if(partieTerminal.getTypeDePartie().equals("Interface")){
+				if(this instanceof SogoTournant){
+					sogo = this;
+				}
+				chargePlateauInterface(event);
+				if(partieInterface.getModeJeux().equals("continue")){
+					sogo = this;
+					sogo.plateau.retabliPlateau();
+				}
+				activeCapteurJoueurActeul();
+				return;
+			}else{
+				jouerPartie(null);
+			}
+			input.archiverPartie(event);
+			if(partieTerminal.getTypeDePartie().equals("Interface")){
+				input.setFile((this instanceof SogoTournant)?"4":"3");
+			}else{
+				input.setFile((this instanceof SogoTournant)?"2":"1");
+			}
+			input.demanderNouvellePartie(null);
+			if(partieTerminal. getChoiceBoolean()){
+				reinitialiserPartie();
+			}else{
+				nouvellePartie = false;
+			}
+		}
+	}
+
+	/**
+	 * Méthode pour afficher l'interface de jeu.
+	 * @param event
+	 */
+	public void chargePlateauInterface(ActionEvent event){
+		Parent root = null;
+		Scene scene = null;
+		Stage primaryStage = null;
+		if(!partieInterface.getModeJeux().equals("lecture")){
+			Node  source = (Node)  event.getSource();
+			primaryStage = (Stage) source.getScene().getWindow();
+
+		}else{
+			primaryStage = partieInterface.getStage();
+		}
+		primaryStage.setWidth(1200);
+		primaryStage.setHeight(650);
+		partieInterface.setStage(primaryStage);
+		try{
+			root  = FXMLLoader.load(getClass().getResource((sogo instanceof SogoTournant)?"/application/FXMLFILE/Plateau2.fxml":"/application/FXMLFILE/Plateau1.fxml" ));
+			scene = new Scene(root,1200,600);
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			primaryStage.setScene(scene);
+			primaryStage.show();
+		}catch(Exception e){
+			System.out.println("Chargement Plateau");
+		}
+		initialiseInterfaceParametres(primaryStage);
+	}
+
+	/**
+	 * Initialise la partie droite de l'écran (avec les informations) pendant le jeu.
+	 *
+	 * @param primaryStage
+	 */
+	public void initialiseInterfaceParametres(Stage primaryStage){
+		Node n = primaryStage.getScene().lookup("#communication");
+		if(partieInterface.getModeJeux().equals("lecture")){
+			((TextArea )n).setText("Partie en mode lecture cliquez progressivement sur le bouton play\n" +
+					"Joueur " + joueurActuel.getNom() + ", à vous de jouer \n");
+		}else{
+			((TextArea )n).setText("Joueur " + joueurActuel.getNom() + ", à vous de jouer \n");
+			if(joueurActuel instanceof IA){((TextArea )n).appendText("Cliquez sur le bouton IA"+(joueurActuel.getId()+1)+"\n");}
+		}
+		n =  primaryStage.getScene().lookup("#player1Name");
+		((Label)n).setText(joueur1.getNom());
+		n =  primaryStage.getScene().lookup("#player2Name");
+		((Label)n).setText(joueur2.getNom());
+		n =  primaryStage.getScene().lookup("#player1Score");
+		((Label)n).setText(Integer.toString(sogo.nbPartiesGagneesJoueur1));
+		n =  primaryStage.getScene().lookup("#player2Score");
+		((Label)n).setText(Integer.toString(sogo.nbPartiesGagneesJoueur2));
+
+		if(partieInterface.getModeJeux().equals("lecture")){
+			(new Capteurs()).desactiveCapteurs();
+			n =  primaryStage.getScene().lookup("#lectureInterface");
+			((ImageView)n).setVisible(true);
+			n =  primaryStage.getScene().lookup("#lectureInterfaceG");
+			((Region)n).setVisible(true);
+			return;
+		}
+		if(joueur1 instanceof IA && !partieInterface.getModeJeux().equals("lecture")){
+			n =  primaryStage.getScene().lookup("#plateauIA1");
+			((ImageView)n).setVisible(true);
+			(new Capteurs()).desactiveCapteurs();
+		}
+		if(joueur2 instanceof IA && !partieInterface.getModeJeux().equals("lecture")){
+			n =  primaryStage.getScene().lookup("#plateauIA2");
+			((ImageView)n).setVisible(true);
+		}
+
+	}
+	/**
+	 * Joue une partie de Sogo entièrement
+	 */
+	public void jouerPartie(MouseEvent event){
+		String mode = partieTerminal.getModeJeux();
+		boolean verif = false;
+		do{
+
+			if(partieTerminal.getTypeDePartie().equals("Terminal")){
+				affichage.afficherPlateau(plateau);
+			}
+
+			if(joueurActuel instanceof IA){
+				ralentiTime(2000);
+			}
+			//permet de faire une pause dans l'execution du programme
+			if(mode != null && mode.equals("lecture")){
+				ralentiTime(4000);
+			}
+
+			if(partieTerminal.getTypeDePartie().equals("Terminal")){
+				affichage.afficherMessage("Joueur " + joueurActuel.getNom() + ", à vous de jouer");
+			}
+			//Le joueur place un pion
+			if(partieTerminal.getTypeDePartie().equals("Interface") && sogo instanceof SogoTournant){
+				sogo.placerPion(event);
+				if((new Listener()).getNbQuartDeTour() < 0){
+					return;
+				}
+			}else{
+				this.placerPion(event);
+			}
+			joueurActuel = changerJoueurActuel(joueurActuel);
+			if(!verificationWinnerInterFace(nombreDePions,joueurActuel)){
+				if(!joueurGagnant){
+					activeCapteurJoueurActeul();
+					desactiveCapteurJoueurEnAttente();
+				}
+				partieInterface.setNbQuartDeTour(-1);
+				nombreDePions--;
+				return;
+			}
+
+			if(partieTerminal.getTypeDePartie().equals("Terminal")){
+				joueurGagnant = plateau.verifierVictoire();
+				nombreDePions--;
+			}
+
+		}while(!joueurGagnant && nombreDePions > 0);
+		if(plateau.getVictoire(1) && plateau.getVictoire(2)){
+			affichage.afficherMessage("Match nul ! Un point pour les deux joueurs");
+			nbPartiesGagneesJoueur1++;
+			nbPartiesGagneesJoueur2++;
+		} else if(plateau.getVictoire(1)){
+			affichage.afficherMessage("Le joueur " + joueur1.getNom() + " a gagné !");
+			nbPartiesGagneesJoueur1++;
+		} else if(plateau.getVictoire(2)){
+			affichage.afficherMessage("Le joueur " + joueur2.getNom() + " a gagné !");
+			nbPartiesGagneesJoueur2++;
+		} else {
+			affichage.afficherMessage("Match nul !");
+		}
+
+		affichage.afficherPlateau(plateau);
+		if(mode != null && mode.equals("lecture")){
+			System.exit(0);
+		}
+		affichage.afficherMessage(joueur1.getNom() + " : " + nbPartiesGagneesJoueur1 + " | " + nbPartiesGagneesJoueur2 + " : " + joueur2.getNom());
+	}
+
+	/**
+	 * Charge la page qui propose d'archiver la partie
+	 * @param event En lien avec le bouton "archiver"
+	 */
+	public void chargeArchive(MouseEvent event){
+		if(partieTerminal.getTypeDePartie().equals("Interface")){
+			sogo.nbPartiesGagneesJoueur1 = nbPartiesGagneesJoueur1;
+			sogo.nbPartiesGagneesJoueur2 = nbPartiesGagneesJoueur2;
+			chargePageVictoire(event);
+		}
+	}
+
+	/** charge la page de fin de partie.
+	 *
+	 * @param event
+	 */
+	public void chargePageVictoire(MouseEvent event){
+		Node  source = (Node)  event.getSource();
+		Stage stage = (Stage) source.getScene().getWindow();
+		stage.setWidth(700);
+		stage.setHeight(400);
+		partieInterface.setStage(stage);
+		Scene scene = null;
+		Parent root = null;
+		try{
+			root  = FXMLLoader.load(getClass().getResource("/application/FXMLFILE/victoire.fxml"));
+			partieInterface.setRoot(root);
+			scene = new Scene(root,700,400);
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			stage.setScene(scene);
+			stage.show();
+		}catch(Exception e){
+			System.out.println("Chargement victoire");
+		}
+	}
+
+	/**
+	 * fonction pour faire une pause dans le programme
+	 * @param time
+	 */
+	public void ralentiTime(int time){
+		try{
+			Thread.sleep(time);
+		}catch(InterruptedException e){
+			System.out.println("Ralentissement de l'execution du programme");
+		}
+	}
+
+	/**
+	 * Gère les vérifications de victoire et intéragit avec les joueurs.
+	 * @param nombreDePions
+	 * @param joueurActuel
+	 * @return
+	 */
+	public boolean verificationWinnerInterFace(int nombreDePions, Joueur joueurActuel){
+		if(partieTerminal.getTypeDePartie().equals("Interface") && !joueurGagnant && nombreDePions > 0){
+			try{
+				joueurGagnant = sogo.plateau.verifierVictoire();
+				if(!joueurGagnant){
+					Stage stage = partieInterface.getStage();
+					Node n = stage.getScene().lookup("#communication");
+					((TextArea )n).appendText("Joueur " + joueurActuel.getNom() + ", à vous de jouer \n");
+					if(joueurActuel instanceof IA){((TextArea )n).appendText("Cliquez sur le bouton IA"+(joueurActuel.getId()+1)+"\n");}
+					return false;
+				}else{
+					joueurActuel = changerJoueurActuel(joueurActuel);
+					if(joueurActuel == joueur1) {
+						nbPartiesGagneesJoueur1++;
+					}else{
+						nbPartiesGagneesJoueur2++;
+					}
+					Stage stage = partieInterface.getStage();
+					Node n = stage.getScene().lookup("#communication");
+					((TextArea )n).appendText("Joueur " + joueurActuel.getNom() + ", a gagné !");
+					if(!partieInterface.getModeJeux().equals("lecture")){
+						n = partieInterface.getStage().getScene().lookup("#archiver");
+						((Button)n).setVisible(true);
+						if(partieInterface.getModeJeux().equals("continue")){
+							((Button)n).setDisable(true);
+						}
+						n = partieInterface.getStage().getScene().lookup("#Continue1");
+						((Button)n).setVisible(true);
+						(new Capteurs()).desactiveCapteurs();
+						desactiveCapteurJoueurEnAttente();
+					}else{
+						n = stage.getScene().lookup("#lectureInterfaceG");
+						((Region)n).setDisable(true);
+					}
+					return false;
+				}
+			}catch(Exception e){
+				System.out.println("Interaction avec les joueurs");
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Place le pion sur le plateau, qu'il s'agisse d'une IA ou d'un humain.
+	 * @param event
+	 */
+	public void placerPion(MouseEvent event){
+		boolean placement = false;
+		Coordonnees coordonnees;
+		ScannerInput tmp = new ScannerInput();
+		String mode = tmp.getModeJeux();
+
+		while(!placement){
+			coordonnees = joueurActuel.demanderCoup(event,partieTerminal.getTypeDePartie().equals("Interface")?new Listener():new ScannerInput());
+			if(mode != null && mode.equals("lecture")){
+				affichage.afficherMessage(joueurActuel.getNom()+"("+((joueurActuel instanceof IA)?"IA":"Humain")+")"+" a joué en "+((char)(97+coordonnees.getX()))+(coordonnees.getY()+1));
+			}else if(partieInterface.getModeJeux().equals("lecture")){
+				Stage stage = partieInterface.getStage();
+				Node n = stage.getScene().lookup("#communication");
+				((TextArea )n).appendText(joueurActuel.getNom()+"("+((joueurActuel instanceof IA)?"IA":"Humain")+")"+" a joué en "+((char)(97+coordonnees.getX()))+(coordonnees.getY()+1)+"\n");
+			}
+			if(coordonnees.getX()== -1 && partieTerminal.getTypeDePartie().equals("Terminal")){
+				Sauvegarde obj1 = new Sauvegarde();
+				obj1.setSauveOBJ(typeSogoEnCours,plateau, joueur1, joueur2, joueurActuel, affichage, tmp, nombreDePions, nbPartiesGagneesJoueur1, nbPartiesGagneesJoueur2);
+				SerializeObjects obj = new SerializeObjects((this instanceof SogoTournant)?"2":"1");
+				obj.saveGame(obj1);//le sogo actuel
+				System.exit(0);
+			}
+			try{
+				if( partieTerminal.getTypeDePartie().equals("Terminal")){
+					plateau.placer(coordonnees, joueurActuel,"NONCALCUL");
+				}else if(partieTerminal.getTypeDePartie().equals("Interface") && this instanceof SogoTournant){
+					this.plateau.placer(coordonnees, joueurActuel,"NONCALCUL");
+					return;
+				}else{
+					sogo.plateau.placer(coordonnees, joueurActuel,"NONCALCUL");
+					return;
+				}
+				nombreDePions--;
+				placement = true;
+			} catch (ExceptionPilierRempli e){
+				affichage.afficherMessage(e.toString());
+			}
+		}
+	}
+
+	/**
+	 * Fait appel à la méthode d'archivage présente dans listener
+	 * @param event
+	 */
+	public void archivePartieInterface(ActionEvent event){
+		partieInterface.archiverPartie(event);
+	}
+
+	/**
+	 * Fait appel à la méthode de confirmation présente dans listener
+	 * @param event
+	 */
+	public void archiveConfimation(ActionEvent event){
+		partieInterface.confirmation(event);
+	}
+
+	/**
+	 * Fait appel à la méthode pour redémarrer la partie.
+	 * @param event
+	 */
+	public void replayStart(ActionEvent event){
+		partieInterface.replayStart(event);
+
+	}
+	/**
+	 * Change le joueur actuel
+	 */
+
+	public Joueur changerJoueurActuel(Joueur joueurActuel){
+		if(joueurActuel == joueur1){
+			return joueur2;
+		} else {
+			return joueur1;
+		}
+	}
+
+	/**
+	 * Recommence la saisie si l'on s'est trompé en entrant les infos du joueur.
+	 * @param event
+	 */
+	public void recommencer(ActionEvent event){
+		String choice = ((Button) event.getSource()).getId();
+		if(choice.equals("recommencer1")){
+			joueur1 = null;
+			partieInterface.recommencer(choice,playerHumain1,playerIA1,zoneDeSaisie1,combobox1,combobox3);
+		}else if(choice.equals("recommencer2")){
+			joueur2 = null;
+			partieInterface.recommencer(choice,playerHumain2,playerIA2,zoneDeSaisie2,combobox2,combobox4);
+		}
+	}
+	public void backButton(ActionEvent event){
+		partieInterface.backButton(event);
+	}
+
+
+	/**
+	 * Réinitialise le plateau de jeu et le nombre de pions de Sogo pour permettre à une nouvelle partie d'être lancée
+	 */
+	public void reinitialiserPartie(){
+		joueurGagnant = false;
+		this.nombreDePions = 64;
+		this.plateau = new Plateau(4, 4, 4);
+	}
+
+	ObservableList<String> options1 = FXCollections.observableArrayList(
+			"0","1","2","3"
+	);
+	ObservableList<String> options2 = FXCollections.observableArrayList(
+			"egoïste", "agressif","intelligent"
+	);
+
+	@Override
+	public void initialize(URL location, ResourceBundle resources) {
+		try{
+			//4/4 combobox sont utlisés
+			combobox1.setItems(options1);
+			combobox2.setItems(options1);
+			combobox3.setItems(options2);
+			combobox4.setItems(options2);
+		}catch(Exception e){
+			//0 combobox est utilisé
+			//ou 2/4 combobox sont utilisés(partie avec L'IA)
+		}
+
+	}
+
+	/**
+	 * Permet de quitter la partie, en gérant la sauvegarde.
+	 */
+	@FXML
+	public void exit(){
+		if(!joueurGagnant){
+			Sauvegarde obj1 = new Sauvegarde();
+			ScannerInput tmp = new ScannerInput();
+			obj1.setSauveOBJ(typeSogoEnCours,sogo.plateau, sogo.joueur1, sogo.joueur2, sogo.joueurActuel, sogo.affichage, tmp, sogo.nombreDePions, sogo.nbPartiesGagneesJoueur1, sogo.nbPartiesGagneesJoueur2);
+			SerializeObjects obj = new SerializeObjects((sogo instanceof SogoTournant)?"4":"3");
+			obj.saveGame(obj1);//le sogo actuel
+		}else{
+			partieInterface.clear((sogo instanceof SogoTournant)?"4":"3");
+		}
+		partieInterface.exit();
+	}
+
+	public void activeCapteurJoueurActeul(){
+		Stage stage = partieInterface.getStage();
+		if(joueurActuel instanceof IA && joueurActuel == joueur1){
+			Node n = stage.getScene().lookup("#plaTeauIA1");
+			((Region)n).setVisible(true);
+		}else if(joueurActuel instanceof IA && joueurActuel == joueur2){
+			Node n = stage.getScene().lookup("#plaTeauIA2");
+			((Region)n).setVisible(true);
+		}else if(joueurActuel instanceof Humain){
+			(new Capteurs()).activeCapteurs();
+		}
+	}
+	public void desactiveCapteurJoueurEnAttente(){
+		Stage stage = partieInterface.getStage();
+		if(joueurActuel == joueur1 && joueur2 instanceof IA){
+			Node n = stage.getScene().lookup("#plaTeauIA2");
+			((Region)n).setVisible(false);
+
+		}else if(joueurActuel == joueur2 && joueur1 instanceof IA){
+			Node n = stage.getScene().lookup("#plaTeauIA1");
+			((Region)n).setVisible(false);
+
+		}else if(!(joueurActuel  instanceof Humain)){
+			(new Capteurs()).desactiveCapteurs();
+		}
+	}
+	public class Pions implements Serializable{
+
+		/**
+		 *
+		 */
+		private static final long serialVersionUID = 1L;
+		@FXML
+		private Sphere p000;
+		@FXML
+		private Sphere p001;
+		@FXML
+		private Sphere p002;
+		@FXML
+		private Sphere p003;
+
+		@FXML
+		private Sphere p010;
+		@FXML
+		private Sphere p011;
+		@FXML
+		private Sphere p012;
+		@FXML
+		private Sphere p013;
+
+		@FXML
+		private Sphere p020;
+		@FXML
+		private Sphere p021;
+		@FXML
+		private Sphere p022;
+		@FXML
+		private Sphere p023;
+
+		@FXML
+		private Sphere p030;
+		@FXML
+		private Sphere p031;
+		@FXML
+		private Sphere p032;
+		@FXML
+		private Sphere p033;
+
+
+
+
+		@FXML
+		private Sphere p100;
+		@FXML
+		private Sphere p101;
+		@FXML
+		private Sphere p102;
+		@FXML
+		private Sphere p103;
+
+		@FXML
+		private Sphere p110;
+		@FXML
+		private Sphere p111;
+		@FXML
+		private Sphere p112;
+		@FXML
+		private Sphere p113;
+
+		@FXML
+		private Sphere p120;
+		@FXML
+		private Sphere p121;
+		@FXML
+		private Sphere p122;
+		@FXML
+		private Sphere p123;
+
+		@FXML
+		private Sphere p130;
+		@FXML
+		private Sphere p131;
+		@FXML
+		private Sphere p132;
+		@FXML
+		private Sphere p133;
+
+
+
+		@FXML
+		private Sphere p200;
+		@FXML
+		private Sphere p201;
+		@FXML
+		private Sphere p202;
+		@FXML
+		private Sphere p203;
+
+		@FXML
+		private Sphere p210;
+		@FXML
+		private Sphere p211;
+		@FXML
+		private Sphere p212;
+		@FXML
+		private Sphere p213;
+
+		@FXML
+		private Sphere p220;
+		@FXML
+		private Sphere p221;
+		@FXML
+		private Sphere p222;
+		@FXML
+		private Sphere p223;
+
+		@FXML
+		private Sphere p230;
+		@FXML
+		private Sphere p231;
+		@FXML
+		private Sphere p232;
+		@FXML
+		private Sphere p233;
+
+
+
+
+		@FXML
+		private Sphere p300;
+		@FXML
+		private Sphere p301;
+		@FXML
+		private Sphere p302;
+		@FXML
+		private Sphere p303;
+
+		@FXML
+		private Sphere p310;
+		@FXML
+		private Sphere p311;
+		@FXML
+		private Sphere p312;
+		@FXML
+		private Sphere p313;
+
+		@FXML
+		private Sphere p320;
+		@FXML
+		private Sphere p321;
+		@FXML
+		private Sphere p322;
+		@FXML
+		private Sphere p323;
+
+		@FXML
+		private Sphere p330;
+		@FXML
+		private Sphere p331;
+		@FXML
+		private Sphere p332;
+		@FXML
+		private Sphere p333;
+
+	}
+	public class Capteurs implements Serializable{
+		@FXML
+		private Region a1;
+		@FXML
+		private Region a2;
+		@FXML
+		private Region a3;
+		@FXML
+		private Region a4;
+
+
+		@FXML
+		private Region b1;
+		@FXML
+		private Region b2;
+		@FXML
+		private Region b3;
+		@FXML
+		private Region b4;
+
+
+		@FXML
+		private Region c1;
+		@FXML
+		private Region c2;
+		@FXML
+		private Region c3;
+		@FXML
+		private Region c4;
+
+
+
+		@FXML
+		private Region d1;
+		@FXML
+		private Region d2;
+		@FXML
+		private Region d3;
+		@FXML
+		private Region d4;
+
+		public void desactiveCapteurs(){
+			Stage stage = partieInterface.getStage();
+			Node n = stage.getScene().lookup("#a1");
+			((Region)n).setVisible(false);
+			n = stage.getScene().lookup("#a2");
+			((Region)n).setVisible(false);
+			n = stage.getScene().lookup("#a3");
+			((Region)n).setVisible(false);
+			n = stage.getScene().lookup("#a4");
+			((Region)n).setVisible(false);
+
+			n = stage.getScene().lookup("#b1");
+			((Region)n).setVisible(false);
+			n = stage.getScene().lookup("#b2");
+			((Region)n).setVisible(false);
+			n = stage.getScene().lookup("#b3");
+			((Region)n).setVisible(false);
+			n = stage.getScene().lookup("#b4");
+			((Region)n).setVisible(false);
+
+			n = stage.getScene().lookup("#c1");
+			((Region)n).setVisible(false);
+			n = stage.getScene().lookup("#c2");
+			((Region)n).setVisible(false);
+			n = stage.getScene().lookup("#c3");
+			((Region)n).setVisible(false);
+			n = stage.getScene().lookup("#c4");
+			((Region)n).setVisible(false);
+
+			n = stage.getScene().lookup("#d1");
+			((Region)n).setVisible(false);
+			n = stage.getScene().lookup("#d2");
+			((Region)n).setVisible(false);
+			n = stage.getScene().lookup("#d3");
+			((Region)n).setVisible(false);
+			n = stage.getScene().lookup("#d4");
+			((Region)n).setVisible(false);
+		}
+		public void activeCapteurs(){
+			Stage stage = partieInterface.getStage();
+			Node n = stage.getScene().lookup("#a1");
+			((Region)n).setVisible(true);
+			n = stage.getScene().lookup("#a2");
+			((Region)n).setVisible(true);
+			n = stage.getScene().lookup("#a3");
+			((Region)n).setVisible(true);
+			n = stage.getScene().lookup("#a4");
+			((Region)n).setVisible(true);
+
+			n = stage.getScene().lookup("#b1");
+			((Region)n).setVisible(true);
+			n = stage.getScene().lookup("#b2");
+			((Region)n).setVisible(true);
+			n = stage.getScene().lookup("#b3");
+			((Region)n).setVisible(true);
+			n = stage.getScene().lookup("#b4");
+			((Region)n).setVisible(true);
+
+			n = stage.getScene().lookup("#c1");
+			((Region)n).setVisible(true);
+			n = stage.getScene().lookup("#c2");
+			((Region)n).setVisible(true);
+			n = stage.getScene().lookup("#c3");
+			((Region)n).setVisible(true);
+			n = stage.getScene().lookup("#c4");
+			((Region)n).setVisible(true);
+
+			n = stage.getScene().lookup("#d1");
+			((Region)n).setVisible(true);
+			n = stage.getScene().lookup("#d2");
+			((Region)n).setVisible(true);
+			n = stage.getScene().lookup("#d3");
+			((Region)n).setVisible(true);
+			n = stage.getScene().lookup("#d4");
+			((Region)n).setVisible(true);
+		}
+	}
+
+}
+

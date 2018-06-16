@@ -1,0 +1,384 @@
+import java.io.Serializable;
+public class Plateau implements Serializable{
+
+  protected Pion[][][] plateau;
+  protected Coordonnees dernierCoup;
+
+  public Plateau(int x, int y , int z){
+    this.plateau = new Pion[x][y][z];
+    this.dernierCoup = null;
+  }
+
+  public Pion[][][] getPlateau(){
+    return this.plateau;
+  }
+
+  public Pion getPion(int x, int y ,int z){
+    if(x >= 0 && y >= 0 && z >= 0 && x < plateau.length && y < plateau[0].length && z < plateau[0][0].length){
+      return plateau[x][y][z];
+    }
+
+    return null;
+  }
+
+  public boolean setPion(int x, int y, int z, Joueur joueur){
+    if(this.getPion(x, y, z) == null){
+      plateau[x][y][z] = new Pion(joueur);
+      return true;
+    }
+
+    return false;
+  }
+
+  public void retirerPion(int x, int y){
+    for(int z = 3; z >= 0; z--){
+      if(this.getPion(x, y, z) != null){
+        plateau[x][y][z] = null;
+        break;
+      }
+    }
+  }
+
+  /**
+    * Place le pion sur le plateau
+    * Si le pion est placé, ses coordonnees sont ajoutés dans dernierCoup
+    * @param coordonnees les coordonnees du pilier où on veut ajouter un pion
+    * @param joueur le joueur qui ajoute son pion
+    * Soulève une exception si on ne peut pas paser le pion
+    */
+  public void placer(Coordonnees coordonnees, Joueur joueur) throws ExceptionPilierRempli{
+
+    int x = coordonnees.getX();
+    int y = coordonnees.getY();
+
+    boolean placement = false;
+
+    for(int z = 0; z < plateau.length; z++){
+      if(this.setPion(x, y, z, joueur) == true){
+        placement = true;
+        dernierCoup = coordonnees;
+        break;
+      }
+    }
+
+    if(!placement){
+      throw new ExceptionPilierRempli(coordonnees);
+    }
+
+  }
+
+  /**
+    * Vérifie si un des joueurs a gagné la partie ou non
+    * Regarde les conditions de victoire à partir des coordonnées du dernier pion placé , pour optimiser la vérification
+    * @return true si un des joueurs à gagné la partie, false sinon
+    */
+  	public boolean verifierVictoire(){
+		//D'abord il faut trouver l'emplacement exact du dernier coup joué
+		int X = dernierCoup.getX();
+		int Y = dernierCoup.getY();
+		int Z=plateau[0][0].length-1; // on se place en haut du plateau
+
+		while (getPion(X, Y, Z)==null){
+			//On descend le pilier jusqu'à trouver un pion, qui est logiquement le dernier joué.
+			Z--;
+		}
+
+		// On a à présent nos coordonnées X, Y, Z du dernier pion posé. On récupère le joueur de ce pion.
+		int joueur = getPion(X, Y, Z).getJoueur().getId();
+
+		// On utilise des coordonnées temporaire x, y, z.
+		int x=X;
+		int y=Y;
+		int z=Z;
+
+		// Vérification en x.
+		while(getPion(x-1,y,z)!=null && getPion(x-1, y, z).getJoueur().getId()==joueur){ // Tant qu'on peut translater en x en restant sur les pion du joueur en cours...
+			x = x-1; // ...On le fait.
+		}
+
+		// On initialise un compteur pour compter le nombre de pions alignés
+		int cpt=1;
+
+		while(getPion(x+1,y,z)!=null && getPion(x+1, y, z).getJoueur().getId()==joueur){ // Tant qu'on peut translater en x dans l'autre sens en restant sur les pion du joueur en cours...
+			x = x+1; // ...On le fait...
+			cpt++; // ...Et on incrémente le compteur pour compter le nombre de pions alignés.
+		}
+
+		if(cpt>=4){
+			return true; // Si on a compté plus de 4 pions alignés, on retourne Vrai.
+		}
+
+		// Même chose en y, en z et pour les diagonales.
+		x=X;
+		y=Y;
+		z=Z;
+
+		while(getPion(x,y-1,z)!=null && getPion(x, y-1, z).getJoueur().getId()==joueur){
+			y = y-1;
+		}
+
+		cpt=1;
+
+		while(getPion(x,y+1,z)!=null && getPion(x, y+1, z).getJoueur().getId()==joueur){
+			y = y+1;
+			cpt++;
+		}
+
+		if(cpt>=4){
+			return true;
+		}
+
+		x=X;
+		y=Y;
+		z=Z;
+
+		while(getPion(x,y,z-1)!=null && getPion(x, y, z-1).getJoueur().getId()==joueur){
+			z = z-1;
+		}
+
+		cpt=1;
+
+		while(getPion(x,y,z+1)!=null && getPion(x, y, z+1).getJoueur().getId()==joueur){
+			z = z+1;
+			cpt++;
+		}
+
+		if(cpt>=4){
+			return true;
+		}
+
+		x=X;
+		y=Y;
+		z=Z;
+
+		while(getPion(x-1,y,z-1)!=null && getPion(x-1, y, z-1).getJoueur().getId()==joueur){
+			x = x-1;
+			z = z-1;
+		}
+
+		cpt=1;
+
+		while(getPion(x+1,y,z+1)!=null && getPion(x+1, y, z+1).getJoueur().getId()==joueur){
+			x = x+1;
+			z = z+1;
+			cpt++;
+		}
+
+		if(cpt>=4){
+			return true;
+		}
+
+		x=X;
+		y=Y;
+		z=Z;
+
+		while(getPion(x-1,y,z+1)!=null && getPion(x-1, y, z+1).getJoueur().getId()==joueur){
+			x = x-1;
+			z = z+1;
+		}
+
+		cpt=1;
+
+		while(getPion(x+1,y,z-1)!=null && getPion(x+1, y, z-1).getJoueur().getId()==joueur){
+			x = x+1;
+			z = z-1;
+			cpt++;
+		}
+
+		if(cpt>=4){
+			return true;
+		}
+
+		x=X;
+		y=Y;
+		z=Z;
+
+		while(getPion(x-1, y-1, z)!=null && getPion(x-1, y-1, z).getJoueur().getId()==joueur){
+			x = x-1;
+			y = y-1;
+
+		}
+
+		cpt=1;
+
+		while(getPion(x+1, y+1, z)!=null && getPion(x+1, y+1, z).getJoueur().getId()==joueur){
+			x = x+1;
+			y = y+1;
+			cpt++;
+		}
+
+		if(cpt>=4){
+			return true;
+		}
+
+		x=X;
+		y=Y;
+		z=Z;
+
+		while(getPion(x-1, y+1, z)!=null && getPion(x-1, y+1, z).getJoueur().getId()==joueur){
+			x = x-1;
+			y = y+1;
+
+		}
+
+		cpt=1;
+
+		while(getPion(x+1, y-1, z)!=null && getPion(x+1, y-1, z).getJoueur().getId()==joueur){
+			x = x+1;
+			y = y-1;
+			cpt++;
+		}
+
+		if(cpt>=4){
+			return true;
+		}
+
+		x=X;
+		y=Y;
+		z=Z;
+
+		while(getPion(x,y-1,z-1)!=null && getPion(x, y-1, z-1).getJoueur().getId()==joueur){
+			y = y-1;
+			z = z-1;
+		}
+
+		cpt=1;
+
+		while(getPion(x,y+1,z+1)!=null && getPion(x, y+1, z+1).getJoueur().getId()==joueur){
+			y = y+1;
+			z = z+1;
+			cpt++;
+		}
+
+		if(cpt>=4){
+			return true;
+		}
+
+		x=X;
+		y=Y;
+		z=Z;
+
+		while(getPion(x,y-1,z+1)!=null && getPion(x, y-1, z+1).getJoueur().getId()==joueur){
+			y = y-1;
+			z = z+1;
+		}
+
+		cpt=1;
+
+		while(getPion(x,y+1,z-1)!=null && getPion(x, y+1, z-1).getJoueur().getId()==joueur){
+			y = y+1;
+			z = z-1;
+			cpt++;
+		}
+
+		if(cpt>=4){
+			return true;
+		}
+
+		x=X;
+		y=Y;
+		z=Z;
+
+		while(getPion(x-1,y-1,z-1)!=null && getPion(x-1, y-1, z-1).getJoueur().getId()==joueur){
+			x = x-1;
+			y = y-1;
+			z = z-1;
+		}
+
+		cpt=1;
+
+		while(getPion(x+1,y+1,z+1)!=null && getPion(x+1, y+1, z+1).getJoueur().getId()==joueur){
+			x = x+1;
+			y = y+1;
+			z = z+1;
+			cpt++;
+		}
+
+		if(cpt>=4){
+			return true;
+		}
+
+		x=X;
+		y=Y;
+		z=Z;
+
+		while(getPion(x-1,y-1,z+1)!=null && getPion(x-1, y-1, z+1).getJoueur().getId()==joueur){
+			x = x-1;
+			y = y-1;
+			z = z+1;
+		}
+
+		cpt=1;
+
+		while(getPion(x+1,y+1,z-1)!=null && getPion(x+1, y+1, z-1).getJoueur().getId()==joueur){
+			x = x+1;
+			y = y+1;
+			z = z-1;
+			cpt++;
+		}
+
+		if(cpt>=4){
+			return true;
+		}
+
+		x=X;
+		y=Y;
+		z=Z;
+
+		while(getPion(x-1, y+1, z-1)!=null && getPion(x-1, y+1, z-1).getJoueur().getId()==joueur){
+			x = x-1;
+			y = y+1;
+			z = z-1;
+		}
+
+		cpt=1;
+
+		while(getPion(x+1, y-1, z+1)!=null && getPion(x+1, y-1, z+1).getJoueur().getId()==joueur){
+			x = x+1;
+			y = y-1;
+			z = z+1;
+			cpt++;
+		}
+
+		if(cpt>=4){
+			return true;
+		}
+
+		x=X;
+		y=Y;
+		z=Z;
+
+		while(getPion(x-1, y+1, z+1)!=null && getPion(x-1, y+1, z+1).getJoueur().getId()==joueur){
+			x = x-1;
+			y = y+1;
+			z = z-1;
+		}
+
+		cpt=1;
+
+		while(getPion(x+1, y-1, z-1)!=null && getPion(x+1, y-1, z-1).getJoueur().getId()==joueur){
+			x = x+1;
+			y = y-1;
+			z = z+1;
+			cpt++;
+		}
+
+		if(cpt>=4){
+			return true;
+		}
+		return false;
+	}
+
+  public class Pion implements Serializable{
+
+    private Joueur joueur;
+
+    public Pion(Joueur joueur){
+      this.joueur = joueur;
+    }
+
+    public Joueur getJoueur(){
+      return this.joueur;
+    }
+  }
+}

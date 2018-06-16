@@ -1,0 +1,17 @@
+public class ExceptionPilierRempli extends Exception{
+
+  private Coordonnees coordonnees;
+
+  public ExceptionPilierRempli(Coordonnees coordonnees){
+    this.coordonnees = coordonnees;
+  }
+
+  /**
+    * Description de l'exception contenant les coordonnées du pilier rempli
+    * @return la description de l'exception qui contient les coordonnées du pilier rempli
+    */
+  public String toString(){
+    return "Le pilier en position : " + coordonnees.toString() + " est rempli";
+  }
+
+}

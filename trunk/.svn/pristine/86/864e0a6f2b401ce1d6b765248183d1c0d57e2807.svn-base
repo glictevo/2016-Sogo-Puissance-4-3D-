@@ -1,0 +1,149 @@
+Travail effectué pour le 31 mars : 
+
+-Modifications de l'IA et de différentes classes pour adpatation à l'IA du
+ Sogo tournant.
+ 
+-L'IA du sogo tournant est fonctionnelle
+  -à profondeur 0 : pas de problèmes
+  -à profondeur 1 : environ 7 minutes par coup (trop de calculs à effectuer)
+  
+-Changement des règles pour d'adapter à l'IA du sogo tournant : 
+  -avant : on pouvait choisir de tourner de 1, 2 ou 3 quart(s) de tour les 
+   piliers du milieu à chaque tour (dans la limite des 4 par joueur par partie)
+  -maintenant : on peut choisir de tourner seulement de 1 quart de tour les 
+   piliers du milieu à chaque tour (toujours 4 quart de tour par joueur par 
+   partie)
+   
+-Problème rencontré en voyant l'IA jouer : 
+  -pour le sogo tournant il existe des cas où lorsqu'on tourne les piliers
+   du milieu, les deux joueurs gagnent en même temps
+  -conséquence : nous devrons modifier la fonction de vérification de la 
+   victoire afin de repérer que deux joueurs gagnent en même temps, et dans ce
+   cas leur accorder 1 point chacun
+   
+Pour M. PAGANI : 
+  pourriez-vous regarder le code des classes suivantes et nous dire ce que vous
+  pensez de notre code ?
+  
+  -Sogo.java et SogoTournant.java
+  -IA.java
+  -plateau.java (en prenant en compte que verifierVictoire() sera modifiée)
+
+#############################################
+
+FONCTIONNEMENT DU JEU
+
+#############################################
+
+Dans la doc vous retrouverez un pdf sur le travail de l'affichage sur terminal du plateau.
+
+Le jeu est jouable dès maintenant (sauf pour la condition de victoire) :
+- dans un terminal, aller dans trunk/src
+- javac *.java
+- java Test
+-suivez les instructions du programme
+
+#############################################
+
+ARCHIVES des travaux effectués par semaine :
+
+#############################################
+
+Travail effectué pour le 24 mars : 
+
+-IA fonctionnelle pour le sogo normal
+  -Ajout d'une variable random pour les coups
+   permet d'avoir un choix entre des coups à l'évaluation équivalente
+  -Profondeur max à utiliser 3
+   plus de 3 : attente très longue
+   profondeur 3 : 1 minute par coups environ
+   
+#############################################
+
+Travail effectué pour le 17 mars
+
+-pour la classe IA, ajout des fonctions :
+  -attributionPoints
+  -attributionPointsV2 (on va en discuter avec le prof de TD pour 
+   savoir si cette version est mieux ou si cela influe sur le
+   comportement)
+  -les 12 fonctions d'évaluation (pour les 13 lignes possibles)
+  -constructeur d'une IA
+    -les fonction d'initialisation de comportement
+  -modification dans analyse et demanderCoup : 
+    -on ajoute temporairement un pion sur le plateau
+    -on le retire dès qu'on en a plus besoin
+    
+-pour la classe Plateau
+  -ajout de la fonction retirerPion
+  
+-pour la classe ScannerInput
+  -ajout de demanderJoueur
+  -ajout de demanderHumainOuIA
+  -ajout de demanderProfondeur
+  -ajout de demanderTypeComportement
+  
+Ajout du choix pour l'IA ou l'Humain dans le menu
+(casse l'implémentation de l'enregistrement de partie pour l'instant)
+(pour rétablir l'enregistrement de partie, mais casser la possibilité
+ de choisir l'IA, décommenter le code dans Sogo ligne 41 et 42 et 
+ commenter le code ligne 43 et 44)
+  
+  
+
+#############################################
+
+Travail effectué pour le 10 mars :
+
+-Résolution du problème rencontré la semaine dernière :
+  -Lorsqu'on tournait le plateau, les coordonnees du dernierCoup n'était pas
+   update, ce qui faisait que la fonction de vérification de victoire regardait
+   un mauvais pilier
+   
+#############################################
+
+-Continuation du travail sur l'IA pour le sogo normal, on a commencé à coder
+ les fonctions, mais il reste du travail de reflexion et d'organisation à réglé
+
+-Travail effectué pour le 2 mars
+  -Fragmentation de deroulement dans Sogo afin de profiter de l'héritage de java
+   dans le deroulement de SogoTournant
+    -il ne reste que placerPion() dans SogoTournant, avec un appel à
+     super.placerPion() et le reste de la fonction.
+    -création dans Sogo d'un constructeur prenant un PlateauTournant en plus
+     (pour l'initialisation d'un SogoTournant utilisant le même plateau.
+     (résolution d'un problème : avant il y avait deux plateaux différents,
+     un dans SogoTournant, un dans Sogo)
+
+  -modifications mineures :
+    -ajout d'un exemple lorsqu'on propose au joueur de placer son pion
+    -ajout du numéro du joueur à qui on demande le nom
+
+  -reflexions sur comment coder l'IA et l'interface graphique
+    -voir dans les docs
+    -lorsqu'une IA est créée, son constructeur appelle le constructeur de IA
+     avec les points attribués à chaque action différente selon son comportement
+    -lorsqu'on fait demanderCoup() à une IA, celle-ci fera evaluation() pour
+     chaque placement de pion possible, et choisira la meilleure possibilité
+
+  Problème repéré :
+    -Lors du premier tour, si le joueur place son pion dans un des piliers du
+     milieu, puis qu'il décide de tourner les piliers du centre, le jeu tourne
+     dans le vide (plus rien ne s'affiche, rien n'est faisable)
+      -exemple : placer pion en b2, puis tourner de 2 les piliers directement
+
+#############################################
+
+-Pour la semaine du 25 février :
+  ajout des fonctions :
+  -recupererNom() dans ScannerInput
+  -reinitialiserPartie() dans Sogo
+  -demanderNouvellePartie() dans ScannerInput
+  -demanderNbQuartDeTour() dans ScannerInput
+  -demanderTypePartie() dans ScannerInput
+  -tournerCentre() dans PlateauTournant
+  -deroulement() dans SogoTournant
+  -Création de l'exception ExceptionPilierRempli
+  -vérifierVictoire() dans Plateau
+  -Enregistrer une partie
+    -pouvoir la reprendre

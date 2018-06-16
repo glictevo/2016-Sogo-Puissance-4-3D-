@@ -1,0 +1,10 @@
+Sogo : Tournant
+TypeJoueur : IA
+Profondeur : 1
+TypeComportement : egoïste
+Joueur1nom : lola
+TypeJoueur : Humain
+Joueur2nom : paul
+lola : 3,3
+paul : 0,0
+paul nbQuartDeTour : 0

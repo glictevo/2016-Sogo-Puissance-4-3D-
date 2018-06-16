@@ -1,0 +1,15 @@
+Sogo : simple
+TypeJoueur : IA
+Profondeur : 1
+TypeComportement : intelligent
+Joueur1nom : IA1
+TypeJoueur : IA
+Profondeur : 1
+TypeComportement : intelligent
+Joueur2nom : IA2
+IA1 : 0,3
+IA2 : 2,2
+IA1 : 0,0
+IA2 : 0,2
+IA1 : 3,0
+IA2 : 2,0

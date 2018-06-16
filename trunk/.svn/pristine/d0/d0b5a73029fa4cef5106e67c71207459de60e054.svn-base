@@ -1,0 +1,38 @@
+import java.util.ArrayList;
+import java.io.Serializable;
+public abstract class Joueur implements Serializable{
+
+  protected Input input;
+  private String nom;
+  private int id;
+  private static int countId = 0;
+
+  public Joueur(String nom, Input input){
+    this.nom = nom;
+    this.id = countId;
+    countId++;
+    this.input = input;
+  }
+
+  public int getId(){
+    return this.id;
+  }
+
+  public String getNom(){
+    return this.nom;
+  }
+
+  /**
+    * Appelle l'input du joueur pour demander son coup
+    * @param plateau le plateau du jeu sur lequel le joueur joueur
+    * @return les coordonnees où le joueur veut placer son pion
+    */
+  public abstract Coordonnees demanderCoup(Plateau plateau, Affichage affichage, Write file,String mode, String nomfichier);
+
+  public String toString(){
+    return "Joueur " + nom;
+  }
+
+  public abstract int demanderNbQuartDeTour(Plateau plateau, Affichage affichage, Write file, Joueur j, String mode, String nomfichier);
+
+}

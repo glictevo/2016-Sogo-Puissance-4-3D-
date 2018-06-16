@@ -1,0 +1,26 @@
+import java.io.Serializable;
+public class Coordonnees implements Serializable{
+
+  private int x;
+  private int y;
+
+  public Coordonnees(int x, int y){
+  	this.x = x;
+  	this.y = y;
+  }
+
+  public int getX(){
+    return this.x;
+  }
+
+  public int getY(){
+    return this.y;
+  }
+
+  public String toString(){
+    char alpha = 'A';
+    alpha += x;
+    return "(" + alpha + "," + (y+1) + ")";
+  }
+
+}

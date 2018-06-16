@@ -1,0 +1,17 @@
+public class Humain extends Joueur{
+
+  public Humain(String nom, Input input){
+    super(nom, input);
+  }
+
+  /**
+    * Appelle l'input du joueur Humain pour demander son coup
+    * @param plateau le plateau du jeu sur lequel le joueur joueur
+    * @return les coordonnees où le joueur veut placer son pion
+    */
+  public Coordonnees demanderCoup(Plateau plateau, Affichage affichage,Write file,String mode, String nomfichier){
+    return input.recupererCoordonnees(affichage,file,this,mode,nomfichier);
+  }
+
+
+}

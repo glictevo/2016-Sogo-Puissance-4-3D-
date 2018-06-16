@@ -1,0 +1,524 @@
+import java.util.*;
+import java.io.*;
+import java.io.Serializable;
+public class ScannerInput implements Input,Serializable{
+  private static int curs = 0;
+  private static String mem = "";
+  /**
+    * Demande des coordonnees alphanumériques au joueur (pour des questions de facilités de choix)
+    * tranforme ces coordonnees numérique en coordonnées numériques
+    * @return les coordonnees numeriques que le joueur à choisi
+    */
+  public Coordonnees recupererCoordonnees(Affichage affichage,Write file,Joueur j,String mode, String nomfichier){
+    String str = "";
+    String[] str1 = null;
+    Scanner sc = new Scanner(System.in);
+    Read lire = new Read();
+    int count = 0;
+    if(mode.equals("lecture")){
+      str1 = (lire.readLine(nomfichier)).split(",");
+
+      return(new Coordonnees(Integer.parseInt(str1[0]),Integer.parseInt(str1[1])));
+    }
+    do{
+      if(count > 0){
+        affichage.afficherMessage("Coordonnees invalides, recommencez !/quitter");
+      } else {
+        affichage.afficherMessage("Veuillez rentrer les coordonnees pour placer votre pion(ex : b2)/quitter");
+      }
+
+      str = sc.nextLine();
+      count++;
+    } while(!verifCoord(str));
+
+    if(str.length() == 2){
+      file.write(j.getNom()+" : "+conversCoord(str).getX()+"," + conversCoord(str).getY());
+      return conversCoord(str);
+    }
+    return(new Coordonnees(-1,-1));
+  }
+
+  /**
+    * demande au joueur quels joueurs il veut initialiser (humain ou IA)
+    * @param affichage permet l'affichage des informations
+    */
+  public Joueur demanderJoueur(Affichage affichage, Input input, int numJoueur, Write file, String mode, String nomfichier){
+    int typeJoueur = demanderHumainOuIA(affichage, numJoueur, file, mode, nomfichier);
+    if(typeJoueur == 0){ //Humain
+      Joueur j = new Humain(input.recupererNom(affichage, numJoueur, file, mode, nomfichier), new ScannerInput());
+      mem += j.getNom() + " ";
+      curs++;
+      //Partie Humain contre Humain
+      if(curs == 4){
+        String[] tab = mem.split(" ");
+        affichage.afficherMessage("Début de partie " + tab[0]+ " VS " + tab[2]);
+        affichage.afficherMessage(tab[1] +" contre " + tab[3]);
+        try{
+          Thread.sleep(6000);
+        }catch(InterruptedException e){
+          System.out.println("Test en cours");
+        }
+        curs = 0;
+        mem = "";
+      }
+      //IA vs Humain
+      if(curs == 6){
+        String[] tab = mem.split(" ");
+        affichage.afficherMessage("Début de partie " + tab[0]+ " VS " + tab[4]);
+        affichage.afficherMessage("Joueur1 nom : " + tab[3] + " Profondeur : " + tab[1] + " TypeComportement : " + tab[2]);
+        affichage.afficherMessage("Joueur2 nom : " + tab[5]);
+        try{
+          Thread.sleep(6000);
+        }catch(InterruptedException e){
+          System.out.println("Test en cours");
+        }
+        curs = 0;
+        mem = "";
+      }
+
+      return j;
+    } else { //IA
+      int profondeur = demanderProfondeur(affichage,file,mode,nomfichier);
+      int typeComportement = demanderTypeComportement(affichage,file,mode,nomfichier);
+      Joueur j = new IA(input.recupererNom(affichage, numJoueur, file, mode, nomfichier), profondeur, typeComportement);
+      mem += j.getNom()+" ";
+      curs++;
+      //IA VS IA
+      if(curs == 8){
+        String [] tab = mem.split(" ");
+        affichage.afficherMessage("Début de partie " + tab[0]+ " VS " + tab[4]);
+        affichage.afficherMessage("Joueur1 nom : " + tab[3] + " Profondeur : " + tab[1] + " TypeComportement : " + tab[2]);
+        affichage.afficherMessage("Joueur2 nom : " + tab[7] + " Profondeur : " + tab[5] + " TypeComportement : " + tab[6]);
+        try{
+          Thread.sleep(6000);
+        }catch(InterruptedException e){
+          System.out.println("Test en cours");
+        }
+        curs = 0;
+        mem = "";
+      }
+
+      //Humain VS IA
+      if(curs == 6){
+        String[] tab = mem.split(" ");
+        affichage.afficherMessage("Début de partie " + tab[0]+ " VS " + tab[2]);
+        affichage.afficherMessage("Joueur1 nom : " + tab[1]);
+        affichage.afficherMessage("Joueur2 nom : " + tab[5] + " Profondeur : " + tab[3] + " TypeComportement : " + tab[4]);
+        try{
+          Thread.sleep(6000);
+        }catch(InterruptedException e){
+          System.out.println("Test en cours");
+        }
+        curs = 0;
+        mem = "";
+      }
+      return j;
+    }
+  }
+
+
+  public int demanderHumainOuIA(Affichage affichage, int numJoueur,Write file,String mode,String nomfichier){
+    Scanner sc = new Scanner(System.in);
+    boolean surete = false;
+    String reponse = "";
+    if(mode.equals("lecture")){
+      Read lire = new Read();
+      mem += lire.readLine(nomfichier)+ " ";
+      String[] tab = mem.split(" ");
+      reponse = ((tab[curs].equals("IA"))?"1":"0");
+      curs++;
+      return (Integer.parseInt(reponse));
+    }
+    affichage.afficherMessage("Pour le joueur " + numJoueur + ", voulez-vous qu'il soit Humain(1), ou IA(2) ?");
+    do{
+      reponse = sc.nextLine();
+      if(reponse.equals("1") || reponse.equals("2")){
+          surete = true;
+      } else {
+        affichage.afficherMessage("Veuillez répondre 1 ou 2");
+        affichage.afficherMessage("Pour le joueur " + numJoueur + ", voulez-vous qu'il soit Humain(1), ou IA(2) ?");
+      }
+
+    } while(!surete);
+    if(Integer.parseInt(reponse)-1==0){
+      file.write("TypeJoueur : Humain");
+    }else{
+      file.write("TypeJoueur : IA");
+    }
+    return (Integer.parseInt(reponse) - 1);
+  }
+
+  public int demanderProfondeur(Affichage affichage,Write file,String mode,String nomfichier){
+    Scanner sc = new Scanner(System.in);
+    boolean surete = false;
+    int reponse = -1;
+    if(mode.equals("lecture")){
+      Read lire = new Read();
+      mem  += lire.readLine(nomfichier) + " ";
+      String[] tab = mem.split(" ");
+      reponse = Integer.parseInt(tab[curs]);
+      curs++;
+      return reponse;
+    }
+
+    affichage.afficherMessage("Quelle profondeur d'analyse voulez-vous ? (de 0 à 10)");
+    do {
+      try{
+        reponse = sc.nextInt();
+        if(reponse >= 0 && reponse < 11){
+          surete = true;
+        } else {
+          affichage.afficherMessage("Veuillez rentrer un nombre entre 0 et 10");
+        }
+      } catch(Exception e){
+        affichage.afficherMessage("Veuillez rentrer un nombre");
+      }
+    } while(!surete);
+    file.write("Profondeur : " + reponse);
+    return reponse;
+  }
+
+  public int demanderTypeComportement(Affichage affichage,Write file,String mode,String nomfichier){
+    Scanner sc = new Scanner(System.in);
+    String[] tab = {"egoïste","agressif","intelligent"};
+    boolean surete = false;
+    int reponse = -1;
+    if(mode.equals("lecture")){
+      Read lire = new Read();
+      mem += lire.readLine(nomfichier)+ " ";
+      String[] tmp = mem.split(" ");
+      reponse = localise(tmp[curs],tab);
+      curs++;
+      return reponse;
+    }
+    affichage.afficherMessage("Quel type de comportement voulez-vous pour l'IA ? (1 pour \"egoïste\", 2 pour \"agressif\", 3 pour \"intelligent\")");
+    do {
+      try{
+        reponse = sc.nextInt();
+        if(reponse > 0 && reponse < 4){
+          surete = true;
+        } else {
+          affichage.afficherMessage("Veuillez rentrer 1, 2 ou 3");
+        }
+      } catch(Exception e){
+        affichage.afficherMessage("Veuillez rentrer 1, 2 ou 3");
+      }
+    } while(!surete);
+    file.write("TypeComportement : "+tab[reponse-1]);
+    return reponse;
+  }
+  public int localise(String chaine,String[]str){
+    for(int i = 0; i < str.length; i++){
+      if(str[i].equals(chaine)){
+        return (i+1);
+      }
+    }
+    return -1;
+  }
+  /**
+    * Demande le nom que le joueur veux
+    * Vérifie si le nom qu'il a rentré est celui qu'il veut, sinon redemande quel nom le joueur veux
+    * @param affichage permet l'affichage des informations
+    * @return le nom que le joueur veux
+    */
+  public String recupererNom(Affichage affichage, int joueur,Write file,String mode,String nomfichier){
+    Scanner sc = new Scanner(System.in);
+    String nom = "";
+
+    if(mode.equals("lecture")){
+      Read lire = new Read();
+      return(lire.readLine(nomfichier));
+    }
+
+    affichage.afficherMessage("Joueur " + joueur + " : quel nom voulez-vous avoir ?");
+
+    nom = sc.nextLine();
+    //écriture dans le fichier Test.txt
+    file.write("Joueur" + joueur + "nom : " + nom);
+    return nom;
+  }
+
+  /**
+    * Demande au joueur s'il veux commencer une nouvelle partie
+    * @param affichage permet l'affichage des informations
+    * @return true si le joueur veux commencer une nouvelle partie, false sinon
+    */
+  public boolean demanderNouvellePartie(Affichage affichage,String file){
+    Scanner sc = new Scanner(System.in);
+    int count = 0;
+    String reponse = "";
+    clear(file);
+    affichage.afficherMessage("Voulez-vous commencer une nouvelle partie ? (oui/non)");
+
+    do{
+      if(count > 0) {
+        affichage.afficherMessage("Veuillez taper oui ou non");
+      }
+
+      reponse = sc.nextLine();
+      count++;
+    } while(!reponse.equals("oui") && !reponse.equals("non"));
+
+    if(reponse.equals("oui")) return true;
+    else return false;
+  }
+  public void clear(String file){
+    File f = new File("Partie"+file+".ser");
+    f.delete();
+
+  }
+  public void archiverPartie(Affichage affichage,Write file){
+    Scanner sc = new Scanner(System.in);
+    int count = 0;
+    String reponse = "";
+
+    affichage.afficherMessage("Voulez-vous archiver cette partie ? (oui/non)");
+
+    do{
+      if(count > 0) {
+        affichage.afficherMessage("Veuillez taper oui ou non");
+      }
+
+      reponse = sc.nextLine();
+      count++;
+    } while(!reponse.equals("oui") && !reponse.equals("non"));
+
+    if(reponse.equals("oui")){
+      confirmation(affichage,file);
+      return;
+    }
+    else return;
+  }
+
+  public void confirmation(Affichage affichage,Write file){
+    Scanner sc = new Scanner(System.in);
+    boolean surete = false;
+    String nomfichier = "";
+    String reponse = "";
+    int count = 0;
+    File repertoire = new File("Archives");
+    File[] files=repertoire.listFiles();
+    boolean existe = false;
+
+    do{
+      affichage.afficherMessage("Veuillez donner un nom à votre fichier");
+
+      nomfichier = sc.nextLine();
+      do{
+        if(count > 0){
+          affichage.afficherMessage("Veuillez taper oui ou non");
+        } else {
+          for(int i = 1; i < files.length; i++){
+            if((nomfichier+".txt").equals(files[i].getName())){
+              existe = true;
+            }
+          }
+          if(!existe){
+            affichage.afficherMessage("Voulez-vous vous appeler votre fichier "+ nomfichier +" ? (oui/non)");
+            reponse = sc.nextLine();
+          }else{
+            affichage.afficherMessage("Le nom voulu existe déjà, veuillez choisir un autre nom");
+            affichage.afficherMessage("Veuillez donner un nom à votre fichier");
+            nomfichier = sc.nextLine();
+            affichage.afficherMessage("Voulez-vous vous appeler votre fichier "+ nomfichier +" ? (oui/non)");
+            reponse = sc.nextLine();
+          }
+        }
+        count++;
+      }while(!reponse.equals("oui") && !reponse.equals("non"));
+
+      if(reponse.equals("oui")) surete = true;
+      else
+        count = 0;
+    }while(!surete);
+    File f = new File(file.getName());
+    f.renameTo(new File("Archives//"+nomfichier+".txt"));
+    return;
+  }
+
+  /**
+    * Demande au joueur de combien de quart de tour il veut tourner le centre du plateau tournant
+    * 0 pour ne pas le tourner
+    * @param affichage permet l'affichage des informations
+    * @return le nombre de quart de tours que le joueur souhaite effectuer
+    */
+  public int demanderNbQuartDeTour(Affichage affichage,Write file,Joueur j,String mode, String nomfichier){
+    Scanner sc = new Scanner(System.in);
+    String reponse = "";
+    Read lire = new Read();
+    int nbQuartDeTour = -1;
+    boolean verif = false;
+    if(mode.equals("lecture")){
+      nbQuartDeTour = Integer.parseInt(lire.readLine(nomfichier));
+      return nbQuartDeTour;
+    }
+
+    affichage.afficherMessage("De combien de quarts de tours voulez-vous tourner le centre du plateau ? (0 pour ne pas le tourner)");
+    do{
+      reponse = sc.nextLine();
+      try {
+        nbQuartDeTour = Integer.parseInt(reponse);
+        if(nbQuartDeTour < 0) {
+          affichage.afficherMessage("Veuillez rentrer un entier positif");
+        } else {
+          verif = true;
+        }
+      } catch(Exception e){
+        affichage.afficherMessage("Veuillez rentrer un entier");
+      }
+    } while(!verif);
+    file.write(j.getNom()+" nbQuartDeTour : "+ nbQuartDeTour);
+    return nbQuartDeTour;
+  }
+
+  /**
+    * Demande au joueur quel type de partie il souhaite jouer
+    * @param affichage permet l'affichage des informations
+    * @return 1 pour Sogo normal, 2 pour Sogo tournant
+    */
+  public String demanderSogo(Affichage affichage){
+    Scanner sc = new Scanner(System.in);
+    String reponse = "";
+    int count = 0;
+    affichage.afficherMessage("Choisissez un Sogo : ");
+    affichage.afficherMessage("1. Sogo Simple \n2. Sogo tournant");
+    do{
+      if(count > 0){
+        affichage.afficherMessage("Veuillez rentrer un chiffre correct");
+      }
+
+      reponse = sc.nextLine();
+
+      if(reponse.equals("1") || reponse.equals("2")){
+        return reponse;
+      }
+
+      count++;
+    } while(true);
+
+
+  }
+  public String demanderVersion(Affichage affichage){
+    Scanner sc = new Scanner(System.in);
+    String reponse = "";
+    int count = 0;
+    affichage.afficherMessage("Choisissez votre version : ");
+    affichage.afficherMessage("1. Terminal \n2. Interface");
+    do{
+      if(count > 0){
+        affichage.afficherMessage("Veuillez rentrer un chiffre correct");
+      }
+
+      reponse = sc.nextLine();
+
+      if(reponse.equals("1") || reponse.equals("2")){
+        return reponse;
+      }
+
+      count++;
+    } while(true);
+
+  }
+  public String demanderTypePartie(Affichage affichage){
+    Scanner sc = new Scanner(System.in);
+    String reponse = "";
+    int count = 0;
+    affichage.afficherMessage("Voulez-vous : ");
+    affichage.afficherMessage("1. Lancer une nouvelle partie  \n2. Continuer une partie \n3. Lire une partie ");
+    do{
+      if(count > 0){
+        affichage.afficherMessage("Veuillez rentrer un chiffre correct");
+      }
+
+      reponse = sc.nextLine();
+
+      if(reponse.equals("1") || reponse.equals("2") || reponse.equals("3")){
+        return reponse;
+      }
+
+      count++;
+    } while(true);
+
+
+  }
+
+  /**Vérifie la cohérence des coordonnées str
+    */
+  public boolean verifCoord(String str){
+    boolean verifNum = false;
+    boolean verifAlph = false;
+    if(str.equals("quitter")){
+      return true;
+    }
+    try{
+      verifNum = 'a'<= str.charAt(0)&&str.charAt(0) <= 'd';
+      verifAlph = 1 <= Integer.parseInt(str.charAt(1)+"") && Integer.parseInt(str.charAt(1)+"") <= 4;
+    }catch(Exception e){}
+
+    return(str.length() == 2 && verifAlph && verifNum);
+  }
+
+  /**Effectue la conversion des coordonnées str
+    *en valeur numérique
+    */
+  public Coordonnees conversCoord(String str){
+    int x = Character.getNumericValue(str.charAt(0))-10;
+    int y = Integer.parseInt(str.charAt(1)+"")-1;
+    return(new Coordonnees(x,y));
+  }
+  public String lsFichiers(Affichage affichage){
+    Scanner sc = new Scanner(System.in);
+    String reponse = "";
+    File repertoire = new File("Archives");
+    File[] files  =repertoire.listFiles();
+
+    int count = 0;
+    if(files.length == 1){return reponse;}
+    affichage.afficherMessage("Veuillez choisir un fichier : /quitter");
+    liste(files,affichage);
+    do{
+      if(count > 0){
+        affichage.afficherMessage("Veuillez rentrer un nom correct/quitter");
+      }
+      reponse = sc.nextLine();
+      if(repCorrect(files,reponse)){return reponse;}
+      if(reponse.equals("quitter")){System.exit(0);}
+      count++;
+    } while(true);
+
+  }
+  public void liste(File[] files, Affichage affichage){
+    for(int i = 1; i < files.length; i++){
+      affichage.afficherMessage(files[i].getName());
+    }
+  }
+  public boolean repCorrect(File[] files,String reponse){
+    for(int i = 1; i < files.length; i++){
+      if((reponse).equals(files[i].getName())){
+        return true;
+      }
+    }
+    return false;
+  }
+  public String suitePartie(Affichage affichage){
+    Scanner sc = new Scanner(System.in);
+    String reponse = "";
+    int count = 0;
+    affichage.afficherMessage("Voulez-vous : ");
+    affichage.afficherMessage("1.Continuer  une partie Sogo simple \n2. Continuer une partie  Sogo tournant");
+    do{
+      if(count > 0){
+        affichage.afficherMessage("Veuillez rentrer un chiffre correct");
+        affichage.afficherMessage("1.Continuer  une partie Sogo simple \n2. Continuer une partie  Sogo tournant");
+      }
+
+      reponse = sc.nextLine();
+
+      if(reponse.equals("1") || reponse.equals("2")){
+        return reponse;
+      }
+
+      count++;
+    } while(true);
+  }
+}

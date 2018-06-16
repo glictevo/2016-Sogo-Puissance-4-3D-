@@ -1,0 +1,163 @@
+import java.io.Serializable;
+public class Sogo implements Serializable{
+
+  protected Plateau plateau;
+  protected Joueur joueur1;
+  protected Joueur joueur2;
+  protected Joueur joueurActuel;
+  protected Affichage affichage;
+  protected Input input;
+  protected int nombreDePions = 64;
+
+  public Sogo(Affichage affichage, Input input){
+    this.joueur1 = null;
+    this.joueur2 = null;
+    this.joueurActuel = null;
+    this.affichage = affichage;
+    this.plateau = new Plateau(4, 4, 4);
+    this.input = input;
+  }
+
+  public Sogo(Affichage affichage, Input input, PlateauTournant plateau){
+    this(affichage, input);
+    this.plateau = plateau;
+  }
+
+  /**
+    * Joue la partie en entière
+    */
+  public void deroulement(Write file, String mode, String nomfichier){
+    //Pour se donner une idée du déroulement :
+    joueurActuel = ((this.joueurActuel==null)?joueur2:changerJoueurActuel(this.joueurActuel));
+    initialiserJoueurs(file,mode,nomfichier);
+    jouerNouvellePartie(file,mode,nomfichier);
+
+  }
+
+  /**
+    * Initialise les joueurs de la partie
+    */
+  public void initialiserJoueurs(Write file, String mode, String nomfichier){
+    //joueur1 = ((this.joueur1 == null)? new Humain(input.recupererNom(affichage, 1,file,mode,nomfichier), new ScannerInput()):this.joueur1);
+    //joueur2 = ((this.joueur2 == null)? new Humain(input.recupererNom(affichage, 2,file,mode,nomfichier), new ScannerInput()):this.joueur2);
+    joueur1 = ((this.joueur1 == null)? input.demanderJoueur(affichage, input, 1, file, mode, nomfichier) : this.joueur1);
+    joueur2 = ((this.joueur2 == null)? input.demanderJoueur(affichage, input, 2, file, mode, nomfichier) : this.joueur2);
+  }
+
+  /**
+    * Permet de jouer plusieurs partie de Sogo si les joueurs le souhaitent
+    */
+  public void jouerNouvellePartie(Write file,String mode, String nomfichier){
+    boolean nouvellePartie = true;
+
+    while(nouvellePartie){
+
+      boolean quitter = false;
+
+      //On lance la boucle du jeu
+      jouerPartie(file,mode,nomfichier);
+      input.archiverPartie(affichage,file);
+      nouvellePartie = input.demanderNouvellePartie(affichage,(this instanceof SogoTournant)?"2":"1");
+      if(nouvellePartie) reinitialiserPartie();
+    }
+
+
+  }
+
+  /**
+    * Joue une partie de Sogo entièrement
+    */
+  public void jouerPartie(Write file,String mode,String nomfichier){
+    boolean joueurGagnant = false;
+
+    do{
+      joueurActuel = changerJoueurActuel(joueurActuel);
+
+      affichage.afficherPlateau(plateau);
+      if(joueurActuel instanceof IA){
+        try{
+          Thread.sleep(500);
+        }catch(InterruptedException e){
+          System.out.println("Test en cours");
+        }
+      }
+      //permet de faire une pause dans l'execution du programme
+      if(mode.equals("lecture")){
+        try{
+          Thread.sleep(4000);
+        }catch(InterruptedException e){
+          System.out.println("Test en cours");
+        }
+      }
+      affichage.afficherMessage("Joueur " + joueurActuel.getNom() + ", à vous de jouer");
+
+      //Le joueur place un pion
+      placerPion(file,mode,nomfichier);
+
+      joueurGagnant = plateau.verifierVictoire();
+
+    } while(!joueurGagnant && nombreDePions > 0);
+
+
+    if(joueurGagnant){
+      affichage.afficherMessage("Le joueur " + joueurActuel.getNom() + " a gagné !");
+    } else {
+      affichage.afficherMessage("Match nul !");
+    }
+    affichage.afficherPlateau(plateau);
+    if(mode.equals("lecture")){
+      System.exit(0);
+    }
+
+  }
+
+  /**
+    * Effectue le placement d'un pion sur le plateau par un joueur
+    */
+  public void placerPion(Write file,String mode, String nomfichier){
+    boolean placement = false;
+    Coordonnees coordonnees;
+
+    while(!placement){
+      coordonnees = joueurActuel.demanderCoup(plateau, affichage,file,mode,nomfichier);
+      if(mode.equals("lecture")){
+        affichage.afficherMessage(joueurActuel.getNom()+"("+((joueurActuel instanceof IA)?"IA":"Humain")+")"+" a joué en "+((char)(97+coordonnees.getX()))+(coordonnees.getY()+1));
+      }
+      if(coordonnees.getX()== -1){
+        SerializeObjects obj = new SerializeObjects((this instanceof SogoTournant)?"2":"1");
+        obj.saveGame(this);//le sogo actuel
+        System.exit(0);
+      }
+
+      try{
+        plateau.placer(coordonnees, joueurActuel);
+        nombreDePions--;
+        placement = true;
+      } catch (ExceptionPilierRempli e){
+        affichage.afficherMessage(e.toString());
+      }
+    }
+
+
+  }
+
+  /**
+    * Change le joueur actuel
+    */
+  public Joueur changerJoueurActuel(Joueur joueurActuel){
+    if(joueurActuel == joueur1){
+      return joueur2;
+    } else {
+      return joueur1;
+    }
+  }
+
+  /**
+    * Réinitialise le plateau de jeu et le nombre de pions de Sogo pour permettre à une nouvelle partie d'être lancée
+    */
+  public void reinitialiserPartie(){
+    this.nombreDePions = 64;
+    this.plateau = new Plateau(4, 4, 4);
+  }
+
+}

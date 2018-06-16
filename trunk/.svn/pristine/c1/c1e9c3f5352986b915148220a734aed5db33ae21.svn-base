@@ -1,0 +1,15 @@
+public interface Affichage{
+
+  /**
+    * Affiche le plateau de jeu
+    * @param plateau le plateau du jeu
+    */
+  public void afficherPlateau(Plateau plateau);
+
+  /**
+    * Affiche un message à l'éconfirmation
+    * @param le message à afficher
+    */
+  public void afficherMessage(String str);
+
+}

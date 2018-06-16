@@ -1,0 +1,49 @@
+/**
+  * Cette classe gère les actions d'un joueur Humain
+  * Les fonctions sont donc adaptées à l'utilisation du jeu par
+  * un joueur réel
+  */
+
+public class Humain extends Joueur{
+
+  /**
+    * Constructeur d'un objet Humain
+    * @param nom le nom du joueur
+    * @param input le type d'input permettant au joueur de communiquer avec le jeu
+    */
+  public Humain(String nom, Input input){
+    super(nom, input);
+  }
+
+  /**
+    * Appelle l'input du joueur Humain pour demander son coup
+    * Les paramètres file, mode et nomfichier permettent d'enregistrer ou de lire
+    * les coups joués par le joueur dans des fonctions appellées dans cette fonction
+    * @param plateau le plateau du jeu sur lequel le joueur joue
+    * @param affichage l'affichage pour les messages et autres à l'écran
+    * @param file le fichier où on écrit la partie (ou on la lit)
+    * @param mode le mode (lecture ou écriture) du fichier
+    * @param nomfichier nom du fichier où on écrit la partie (ou qu'on la lit)
+    * @return les coordonnees où le joueur veut placer son pion
+    */
+  public Coordonnees demanderCoup(Plateau plateau, Affichage affichage,Write file,String mode, String nomfichier){
+    return input.recupererCoordonnees(affichage,file,this,mode,nomfichier);
+  }
+
+  /**
+    * Demande si le joueur souhaite effectuer un quart de tour des piliers
+    * du milieu dans une partie de sogo tournant
+    * Les paramètres file, mode et nomfichier permettent d'enregistrer ou de lire
+    * le fait que le joueur ait effectué un quart de tour à ce moment là du jeu
+    * @param plateau le plateau de jeu sur lequel le joueur joue
+    * @param affichage l'affichage pour les messages et autres à l'écran
+    * @param file le fichier où on écrit la partie (ou on la lit)
+    * @param j le joueur à qui on demande si il veut faire un quart de tour
+    * @param mode le mode (lecture ou écriture) du fichier
+    * @param nomfichier nom du fichier où on écrit la partie (ou qu'on la lit)
+    */
+  public int demanderNbQuartDeTour(Plateau plateau, Affichage affichage, Write file, Joueur j, String mode, String nomfichier){
+    return super.input.demanderNbQuartDeTour(affichage, file, j, mode, nomfichier);
+  }
+
+}

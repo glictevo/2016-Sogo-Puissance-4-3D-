@@ -1,0 +1,13 @@
+package application;
+
+public interface Affichage{
+
+  /**
+    * Affiche le plateau de jeu
+    * @param plateau le plateau du jeu
+    */
+  public void afficherPlateau(Plateau plateau);
+
+  public void afficherMessage(String str);
+
+}

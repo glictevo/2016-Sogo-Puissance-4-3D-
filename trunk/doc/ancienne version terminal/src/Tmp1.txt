@@ -1,0 +1,4 @@
+Sogo : simple
+TypeJoueur : IA
+Profondeur : 1
+TypeComportement : egoïste

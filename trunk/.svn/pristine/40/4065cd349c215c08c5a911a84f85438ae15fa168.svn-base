@@ -1,0 +1,72 @@
+public class Listener implements Input{
+
+  public Coordonnees recupererCoordonnees(Affichage affichage,Write file, Joueur j,String mode, String nomfichier){
+
+
+    return null;
+  }
+
+  public String recupererNom(Affichage affichage, int joueur, Write file, String mode,String nomfichier){
+
+
+    return "";
+  }
+
+  public boolean demanderNouvellePartie(Affichage affichage,String file){
+
+
+    return true;
+  }
+  public void clear(String file){
+  }
+  public void archiverPartie(Affichage affichage,Write file){
+
+  }
+  public void confirmation(Affichage affichage,Write file){
+
+  }
+
+  public int demanderNbQuartDeTour(Affichage affichage,Write file,Joueur j,String mode, String nomfichier){
+
+
+    return 0;
+  }
+
+  public String demanderVersion(Affichage affichage){
+
+    return("");
+  }
+  public String demanderTypePartie(Affichage affichage){
+
+    return "";
+  }
+   public String demanderSogo(Affichage affichage){
+
+    return "";
+  }
+  public String lsFichiers(Affichage affichage){
+    return("");
+  }
+
+  public Joueur demanderJoueur(Affichage affichage, Input input, int numJoueur, Write file, String mode, String nomfichier){
+    return null;
+  }
+
+  public int demanderHumainOuIA(Affichage affichage, int numJoueur,Write file,String mode,String nomfichier){
+    return 0;
+  }
+
+  public int demanderProfondeur(Affichage affichage,Write file,String mode,String nomfichier){
+    return 0;
+  }
+
+  public int demanderTypeComportement(Affichage affichage,Write file,String mode,String nomfichier){
+    return 0;
+  }
+  public int localise(String chaine,String[]str){
+    return 0;
+  }
+  public String suitePartie(Affichage affichage){
+    return("");
+  }
+}

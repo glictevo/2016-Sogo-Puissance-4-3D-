@@ -1,0 +1,66 @@
+import java.io.*;
+public class Test{
+
+    public static void main(String[] args){
+        Write gameFile = null;
+        Read lire= new Read();
+        Affichage affichage = new Terminal();
+        Input input = new ScannerInput();
+        String nomfichier = null;
+        Sogo sogo = null;
+
+        if(input.demanderVersion(affichage).equals("1")){
+            String rep = input.demanderTypePartie(affichage);
+            if(rep.equals("1")){
+                if(input.demanderNouvellePartie(affichage,"")){
+                    rep = input.demanderSogo(affichage);
+                    if(rep.equals("1")){
+                        input.clear("1");
+                        File f = new File("Tmp1.txt");
+                        f.delete();
+                        gameFile = new Write("1");
+                        gameFile.write("Sogo : simple");
+                        sogo = new Sogo(affichage, input);
+                        sogo.deroulement(gameFile,"écriture","");
+                    }else{
+                        input.clear("2");
+                        File f = new File("Tmp2.txt");
+                        f.delete();
+                        gameFile = new Write("2");
+                        gameFile.write("Sogo : Tournant");
+                        sogo = new SogoTournant(affichage, input);
+                        sogo.deroulement(gameFile,"écriture","");
+                    }
+                }else{
+                    main(args);
+                }
+            }else if(rep.equals("2")){
+                DeserializeObjects obj = new DeserializeObjects();
+                if(input.suitePartie(affichage).equals("1")){
+                    sogo = obj.suiteGame("Partie1.ser");
+                }else{
+                    sogo = obj.suiteGame("Partie2.ser");
+                }
+                gameFile = new Write((sogo instanceof Sogo)?"1":"2");
+                sogo.deroulement(gameFile,"écriture","");
+            }else{
+                nomfichier = input.lsFichiers(affichage);
+                if(nomfichier.equals("")){
+                    affichage.afficherMessage("Archives vide, veuillez lancer une nouvelle partie");
+                    main(args);
+                }else{
+                    nomfichier = "Archives//"+nomfichier;
+                    rep = lire.readLine(nomfichier);
+                    if(rep.equals("simple")){
+                        sogo = new Sogo(affichage,input);
+                    }else{
+                        sogo = new SogoTournant(affichage,input);
+                    }
+                    sogo.deroulement(null,"lecture",nomfichier);
+                }
+            }
+        }else{
+            //dans la version interface
+        }
+    }
+}

@@ -1,0 +1,12 @@
+Sogo : simple
+TypeJoueur : Humain
+Joueur1nom : Lola
+TypeJoueur : Humain
+Joueur2nom : Paul
+Lola : 0,0
+Paul : 1,0
+Lola : 0,1
+Paul : 1,1
+Lola : 0,2
+Paul : 1,2
+Lola : 0,3

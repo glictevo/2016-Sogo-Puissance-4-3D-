@@ -1,0 +1,60 @@
+import java.util.ArrayList;
+import java.io.Serializable;
+public abstract class Joueur implements Serializable{
+
+  protected Input input;
+  private String nom;
+  private int id;
+  private static int countId = 0;
+
+  public Joueur(String nom, Input input){
+    this.nom = nom;
+    this.id = countId;
+    countId++;
+    this.input = input;
+  }
+
+  /**
+    * Renvoie l'id du joueur
+    * @return l'id du joueur
+    */
+  public int getId(){
+    return this.id;
+  }
+
+  /**
+    * Renvoie le nom du joueur
+    * @return le nom du joueur
+    */
+  public String getNom(){
+    return this.nom;
+  }
+
+  /**
+    * Appelle l'input du joueur pour demander son coup
+    * @param plateau le plateau du jeu sur lequel le joueur joueur
+    * @return les coordonnees où le joueur veut placer son pion
+    */
+  public abstract Coordonnees demanderCoup(Plateau plateau, Affichage affichage, Write file,String mode, String nomfichier);
+
+  /**
+    * Renvoie la description du joueur (son nom)
+    * @return la description du joueur (son nom)
+    */
+  public String toString(){
+    return "Joueur " + nom;
+  }
+
+  /**
+    * Demande au joueursi il veut effectuer un quart de tour
+    * @param plateau le plateau de jeu sur lequel le joueur joue
+    * @param affichage l'affichage pour les messages et autres à l'écran
+    * @param file le fichier où on écrit la partie (ou on la lit)
+    * @param j le joueur à qui on demande si il veut faire un quart de tour
+    * @param mode le mode (lecture ou écriture) du fichier
+    * @param nomfichier nom du fichier où on écrit la partie (ou qu'on la lit)
+    * @return le nombre de quart de tour que le joueur souhaite effectuer (0 ou 1)
+    */
+  public abstract int demanderNbQuartDeTour(Plateau plateau, Affichage affichage, Write file, Joueur j, String mode, String nomfichier);
+
+}

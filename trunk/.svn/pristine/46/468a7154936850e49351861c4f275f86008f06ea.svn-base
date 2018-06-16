@@ -1,0 +1,39 @@
+public interface Input{
+
+  /**
+    * Renvoie les coordonnees du pilier sur lequel le joueur souhaite ajouter son pion
+    */
+  public Coordonnees recupererCoordonnees(Affichage affichage,Write file,Joueur j,String mode, String nomfichier);
+
+  public String recupererNom(Affichage affichage, int joueur,Write file, String mode, String nomfichier);
+
+  public boolean demanderNouvellePartie(Affichage affichage,String file);
+
+  public void clear(String file);
+
+  public int demanderNbQuartDeTour(Affichage affichage,Write file,Joueur j,String mode, String nomfichier);
+
+  public String demanderVersion(Affichage affichage);
+
+  public String demanderTypePartie(Affichage affichage);
+
+  public String demanderSogo(Affichage affichage);
+
+  public void archiverPartie(Affichage affichage,Write file);
+
+  public void confirmation(Affichage affichage,Write file);
+
+  public String lsFichiers(Affichage affichage);
+
+  public Joueur demanderJoueur(Affichage affichage, Input input, int numJoueur, Write file, String mode, String nomfichier);
+
+  public int demanderHumainOuIA(Affichage affichage, int numJoueur,Write file,String mode,String nomfichier);
+
+  public int demanderProfondeur(Affichage affichage,Write file,String mode,String nomfichier);
+
+  public int demanderTypeComportement(Affichage affichage,Write file,String mode,String nomfichier);
+
+  public int localise(String chaine,String[]str);
+
+  public String suitePartie(Affichage affichage);
+}

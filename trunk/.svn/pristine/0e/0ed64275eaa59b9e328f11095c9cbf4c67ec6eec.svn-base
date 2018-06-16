@@ -1,0 +1,57 @@
+public class SogoTournant extends Sogo{
+
+  private int nbQuartDeTourJoueur1;
+  private int nbQuartDeTourJoueur2;
+
+  public SogoTournant(Affichage affichage, Input input){
+    super(affichage, input, new PlateauTournant(4, 4, 4));
+    this.nbQuartDeTourJoueur1 = 4;
+    this.nbQuartDeTourJoueur2 = 4;
+  }
+
+  /**
+    * Appelle placerPion dans la classe mère
+    * Permet à un joueur de placer un pion sur le plateau
+    * Puis lui permet de tourner ou non les piliers du centre du plateau
+    */
+  public void placerPion(Write file, String mode, String nomfichier){
+    super.placerPion(file,mode,nomfichier);
+
+    //Le joueur choisit s'il veut tourner le centre du plateau ou non
+    boolean verif = false;
+    int nbQuartDeTour = 0;
+    do{
+      nbQuartDeTour = joueurActuel.input.demanderNbQuartDeTour(affichage,file,joueurActuel,mode,nomfichier);
+      affichage.afficherMessage("nbQuartDeTour correspond à : " + nbQuartDeTour);
+      if(joueurActuel == joueur1){
+        if(nbQuartDeTour <= nbQuartDeTourJoueur1){
+          verif = true;
+          nbQuartDeTourJoueur1 -= nbQuartDeTour;
+        }
+      } else {
+        if(nbQuartDeTour <= nbQuartDeTourJoueur2){
+          verif = true;
+          nbQuartDeTourJoueur2 -= nbQuartDeTour;
+        }
+      }
+    } while(!verif);
+
+    //Si le joueur a choisi de déplacer le centre, on le fait
+    if(nbQuartDeTour > 0){
+      for(int i = 0; i < nbQuartDeTour; i++){
+        ((PlateauTournant)super.plateau).tournerCentre();
+      }
+    }
+  }
+
+  /**
+    * Réinitialise le plateau de jeu et le nombre de pions de Sogo pour permettre à une nouvelle partie d'être lancée
+    */
+  public void reinitialiserPartie(){
+    this.nombreDePions = 64;
+    this.nbQuartDeTourJoueur1 = 4;
+    this.nbQuartDeTourJoueur2 = 4;
+    this.plateau = new PlateauTournant(4, 4, 4);
+  }
+
+}

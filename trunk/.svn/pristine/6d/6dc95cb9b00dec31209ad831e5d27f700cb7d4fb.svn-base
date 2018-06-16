@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="417.0" prefWidth="726.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MainController">
+   <children>
+      <Separator layoutX="352.0" layoutY="2.0" orientation="VERTICAL" prefHeight="415.0" prefWidth="5.0" />
+      <Label layoutX="49.0" layoutY="20.0" prefHeight="30.0" prefWidth="246.0" text="                   Player 1" textFill="#7c3535">
+         <font>
+            <Font name="System Bold Italic" size="18.0" />
+         </font>
+      </Label>
+      <Label alignment="CENTER" layoutX="405.0" layoutY="20.0" prefHeight="30.0" prefWidth="246.0" text=" Player 2" textFill="#7c3535">
+         <font>
+            <Font name="System Bold Italic" size="18.0" />
+         </font>
+      </Label>
+      <Button fx:id="Humain1" layoutX="140.0" layoutY="59.0" mnemonicParsing="false" onAction="#active" text="Humain" />
+      <ComboBox fx:id="combobox1" disable="true" layoutX="68.0" layoutY="228.0" prefHeight="27.0" prefWidth="209.0" promptText="Profondeur d'analyse">
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+      </ComboBox>
+      <ComboBox fx:id="combobox3" disable="true" layoutX="68.0" layoutY="262.0" prefHeight="27.0" prefWidth="209.0" promptText="Comportement" />
+      <Separator layoutY="174.0" prefHeight="12.0" prefWidth="729.0" />
+      <Button fx:id="Humain2" layoutX="495.0" layoutY="59.0" mnemonicParsing="false" onAction="#active" text="Humain" />
+      <TextField fx:id="test1" editable="false" layoutX="68.0" layoutY="95.0" prefHeight="27.0" prefWidth="209.0" promptText="Ton nom" />
+      <TextField fx:id="test2" editable="false" layoutX="418.0" layoutY="95.0" prefHeight="27.0" prefWidth="209.0" promptText="Ton nom" />
+      <ComboBox fx:id="combobox2" disable="true" layoutX="421.0" layoutY="228.0" prefHeight="27.0" prefWidth="209.0" promptText="Profondeur d'analyse">
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+      </ComboBox>
+      <ComboBox fx:id="combobox4" disable="true" layoutX="422.0" layoutY="262.0" prefHeight="27.0" prefWidth="209.0" promptText="Comportement" />
+      <Button fx:id="playerOne" disable="true" layoutX="286.0" layoutY="95.0" mnemonicParsing="false" onAction="#playerschoice" text="OK" />
+      <Button fx:id="playerTwo" disable="true" layoutX="638.0" layoutY="95.0" mnemonicParsing="false" onAction="#playerschoice" text="OK" />
+      <Button fx:id="playerIA1" layoutX="151.0" layoutY="186.0" mnemonicParsing="false" onAction="#active" text="IA" />
+      <Button fx:id="playerIA2" layoutX="507.0" layoutY="186.0" mnemonicParsing="false" onAction="#active" text="IA" />
+      <Button fx:id="partie1" disable="true" layoutX="129.0" layoutY="325.0" mnemonicParsing="false" onAction="#playerschoice" text="OK" />
+      <Button fx:id="partie2" disable="true" layoutX="475.0" layoutY="325.0" mnemonicParsing="false" onAction="#playerschoice" text="OK" />
+      <Button fx:id="r1" layoutX="172.0" layoutY="325.0" mnemonicParsing="false" onAction="#recommencer" text="Recommencer" />
+      <Button fx:id="r2" layoutX="523.0" layoutY="325.0" mnemonicParsing="false" onAction="#recommencer" text="Recommencer" />
+      <Button layoutX="21.0" layoutY="365.0" mnemonicParsing="false" onAction="#choiceButton" text="&lt;&lt;&lt;">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+      </Button>
+   </children>
+</AnchorPane>

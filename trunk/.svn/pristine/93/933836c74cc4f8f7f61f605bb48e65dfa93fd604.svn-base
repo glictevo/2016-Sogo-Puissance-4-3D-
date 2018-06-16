@@ -1,0 +1,13 @@
+package application;
+
+import java.io.Serializable;
+
+public class MonRunnable implements Runnable,Serializable{
+	
+	@Override
+	public void run() {
+		Test.main(new String[1]);
+		System.exit(0);
+	}
+
+}

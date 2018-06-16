@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="380.0" prefWidth="630.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.Sogo">
+   <children>
+      <Label layoutX="134.0" layoutY="74.0" prefHeight="75.0" prefWidth="434.0" text="     Voulez-vous archiver la partie ?" textFill="#fffefe9e">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font>
+      </Label>
+      <Button fx:id="archiveOUI" layoutX="276.0" layoutY="152.0" mnemonicParsing="false" onAction="#archivePartieInterface" text="Oui" textFill="#84b4d1f5">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Button>
+      <Button fx:id="archiveNON" layoutX="357.0" layoutY="152.0" mnemonicParsing="false" onAction="#archivePartieInterface" text="Non" textFill="#84b4d1fa">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Button>
+      <Label fx:id="archiveMessage" layoutX="260.0" layoutY="200.0" prefHeight="26.0" prefWidth="322.0" text="Message y ..." textFill="#e4dfdf" visible="false" />
+      <TextField fx:id="zonesaisieArchive" layoutX="262.0" layoutY="232.0" prefHeight="27.0" prefWidth="181.0" text="Tapez par ici" visible="false" />
+      <Button fx:id="validerArchive" layoutX="262.0" layoutY="269.0" mnemonicParsing="false" onAction="#archiveConfimation" prefHeight="28.0" prefWidth="181.0" text="Valider" textFill="#84b4d1f5" visible="false">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Button>
+   </children>
+</AnchorPane>
