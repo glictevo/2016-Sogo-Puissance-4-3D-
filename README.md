@@ -1,9 +1,19 @@
 # 2016-Sogo-Puissance-4-3D-
 
-* Projet réalisé en 2ème année de licence.
+Projet réalisé par :
 
-* Les fichiers se trouvent dans trunk/Interface/src/application
+* Dez Kande
 
-* J'ai travaillé sur l'IA principalement.
+* Jennifer Da Mata Tinoco
 
-* Bonne chance pour arriver à lancer le projet.
+* Etienne Juan-Gesta
+
+* Guillaume Lictevout
+
+Dans le cadre de notre 2ème année de licence informatique à Paris 7 Diderot.
+
+Les fichiers se trouvent dans trunk/Interface/src/application
+
+J'ai travaillé sur l'IA principalement.
+
+Bonne chance pour arriver à lancer le projet.
