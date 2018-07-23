@@ -16,4 +16,4 @@ Les fichiers se trouvent dans trunk/Interface/src/application
 
 J'ai travaillé sur l'IA principalement.
 
-Bonne chance pour arriver à lancer le projet.
+Le projet repose sur une version antérieure de JavaFX, je n'ai pas réussi à le relancer ni à corriger les erreurs, ne connaissant pas JavaFX et n'ayant pas travailleé sur la partie graphique du projet.
