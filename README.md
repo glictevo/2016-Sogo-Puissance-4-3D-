@@ -71,4 +71,18 @@ J'ai travaillé sur l'IA principalement.
 
 ## Screenshots (à venir)
 
+![](Screenshots/1-SogoEcranPrincipal.png)
+
+![](Screenshots/2-ChoixVersionSogo.png)
+
+![](Screenshots/3-ChoixJoueurs.png)
+
+![](Screenshots/4-ChoixJoueurs.png)
+
+![](Screenshots/5-PlateauVide.png)
+
+![](Screenshots/6-PlateauJeu.png)
+
+![](Screenshots/7-PlateauJeuGagnant.png)
+
 ![](image_jeu.jpg)
