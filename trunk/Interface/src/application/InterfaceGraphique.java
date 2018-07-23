@@ -17,13 +17,13 @@ public class InterfaceGraphique implements Affichage{
   }
 
   public void afficherMessage(String str){
-	  
+
   }
   /**
    * methode servant pour l'affichage d'une page fxml
    * @param str correspond au nom de la page
    * @param stage correspond à la scene
-   * @param largeur correspond à la largeur de la page 
+   * @param largeur correspond à la largeur de la page
    * @param hauteur correspond à la hauteur de la page
    */
   public void afficherPageInterface(String str,Stage stage,int largeur, int hauteur){
@@ -31,7 +31,7 @@ public class InterfaceGraphique implements Affichage{
 	  try {
 			Parent root  = FXMLLoader.load(getClass().getResource("/application/FXMLFILE/"+str+".fxml"));
 			Scene scene = new Scene(root,largeur,hauteur);
-		  scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		  scene.getStylesheets().add(getClass().getResource("CODE-CSS/application.css").toExternalForm());
 		  stage.setScene(scene);
 			stage.show();
 			SaveStage.setStage(stage);
